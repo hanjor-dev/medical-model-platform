@@ -1,0 +1,383 @@
+/**
+ * 引荐页面样式 - 原始风格
+ * 
+ * @author hanjor
+ * @version 1.0
+ * @date 2025-01-15 20:10:00
+ */
+
+/* 基础页面布局 */
+.referral-page-github {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.content-area {
+  flex: 1;
+  padding: 20px;
+}
+
+.content-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 页面头部 */
+.page-header {
+  padding: 32px 32px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #303133;
+  margin: 0 0 12px 0;
+}
+
+.page-description {
+  font-size: 16px;
+  color: #606266;
+  margin: 0;
+}
+
+/* 页面内容 */
+.page-content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.content-section {
+  width: 100%;
+}
+
+/* 引荐码区域 */
+.referral-code-section .code-card {
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.code-card .card-header {
+  margin-bottom: 20px;
+}
+
+.code-card .card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #303133;
+  margin: 0 0 6px 0;
+}
+
+.code-card .card-subtitle {
+  font-size: 14px;
+  color: #909399;
+  margin: 0;
+}
+
+.code-card .code-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.code-display .code-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e4e7ed;
+}
+
+.code-wrapper {
+  flex: 1;
+}
+
+.code-label {
+  font-size: 14px;
+  color: #606266;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.code-text {
+  font-size: 32px;
+  font-weight: 700;
+  color: #409eff;
+  font-family: monospace;
+  letter-spacing: 2px;
+}
+
+.code-actions .copy-button {
+  background: #409eff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.code-actions .copy-button:hover {
+  background: #66b1ff;
+}
+
+/* 分享链接区域 */
+.share-link {
+  margin-bottom: 20px;
+}
+
+.link-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.link-label {
+  font-size: 14px;
+  color: #303133;
+  font-weight: 600;
+}
+
+.link-hint {
+  font-size: 12px;
+  color: #909399;
+  font-style: italic;
+}
+
+.link-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.link-preview {
+  flex: 1;
+  background: #f8f9fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.link-text {
+  font-size: 13px;
+  color: #606266;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.copy-link-button {
+  background: #67c23a;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.copy-link-button:hover {
+  background: #85ce61;
+}
+
+/* 分享描述 */
+.share-description {
+  background: #f8f9fa;
+  padding: 16px 20px;
+  border-radius: 8px;
+  border-left: 4px solid #409eff;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.description-icon {
+  width: 24px;
+  height: 24px;
+  background: #409eff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+}
+
+.description-content p {
+  margin: 0;
+  color: #606266;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 引荐用户列表 */
+.referral-users-section .table-section {
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e4e7ed;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.total-count {
+  font-size: 14px;
+  color: #606266;
+  background: #ffffff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid #e4e7ed;
+}
+
+.table-content {
+  padding: 0;
+}
+
+/* Element Plus 表格样式覆盖 */
+.el-table {
+  border: none;
+}
+
+.el-table__header .el-table__cell {
+  background: #f8f9fa;
+  color: #303133;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 12px;
+}
+
+.el-table__body .el-table__row:hover {
+  background: #f5f7fa;
+}
+
+.el-table__body .el-table__row .el-table__cell {
+  border-bottom: 1px solid #f0f0f0;
+  color: #606266;
+  font-size: 13px;
+  padding: 12px;
+}
+
+.el-table__body-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* 用户信息样式 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  .user-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    .avatar-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+.nickname {
+  font-size: 13px;
+  color: #303133;
+  font-weight: 500;
+}
+
+.time-info .date {
+  font-weight: 500;
+  color: #303133;
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+.time-info .time {
+  font-size: 11px;
+  color: #909399;
+}
+
+/* 最后登录时间样式 */
+.last-login-time {
+  font-size: 12px;
+  color: #606266;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+/* 分页 */
+.pagination-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e4e7ed;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .content-area {
+    padding: 16px;
+  }
+  
+  .page-header {
+    padding: 24px 24px 20px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .page-content {
+    padding: 24px;
+    gap: 20px;
+  }
+  
+  .code-display .code-section {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .link-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .table-header {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+} 

@@ -1,0 +1,22 @@
+/* =================================
+   头像组件样式 - 简洁的浅灰色头像
+   ================================= */
+
+/* 头像文字居中对齐 */
+.avatar-text {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  text-align: center !important;
+  line-height: 1 !important;
+}
+
+/* 统一的浅灰色背景 */
+.el-avatar {
+  &:not([src]):not(.has-image) {
+    background: #e8e8e8 !important;
+    color: #666666 !important;
+  }
+}

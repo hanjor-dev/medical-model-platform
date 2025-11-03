@@ -1,0 +1,464 @@
+/**
+ * 个人信息页面样式
+ * 
+ * @author hanjor
+ * @version 1.0
+ * @date 2025-01-15 20:10:00
+ */
+
+.profile-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  // 移动端适配
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}
+
+/* 页面头部样式 */
+.page-header {
+  margin-bottom: 32px;
+  text-align: center;
+  
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    
+    @media (max-width: 768px) {
+      font-size: 24px;
+    }
+  }
+  
+  .page-description {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
+  }
+}
+
+/* 主要内容区域 */
+.profile-content {
+  display: grid;
+  gap: 24px;
+  
+  // 桌面端：三列布局
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+  
+  // 平板端：两列布局
+  @media (min-width: 768px) and (max-width: 1199px) {
+    grid-template-columns: 1fr;
+  }
+  
+  // 移动端：单列布局
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* 卡片样式 */
+.profile-card {
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+  
+  .el-card__header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    
+    @media (max-width: 768px) {
+      padding: 16px 20px;
+    }
+  }
+  
+  .el-card__body {
+    padding: 24px;
+    
+    @media (max-width: 768px) {
+      padding: 20px 16px;
+    }
+  }
+}
+
+/* 卡片头部样式 */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    
+    .el-icon {
+      font-size: 20px;
+      color: #1890ff;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 16px;
+      
+      .el-icon {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+/* 卡片内容样式 */
+.card-content {
+  .avatar-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: #fafafa;
+    border-radius: 8px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      padding: 20px;
+    }
+    
+    .avatar-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .user-avatar {
+        border: 4px solid #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+      
+      .avatar-overlay {
+        position: absolute;
+        bottom: -8px;
+        right: -8px;
+        
+        .avatar-uploader {
+          .el-upload {
+            display: block;
+          }
+        }
+      }
+    }
+    
+    .avatar-info {
+      flex: 1;
+      
+      .avatar-tip {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin: 0 0 8px 0;
+        line-height: 1.5;
+        
+        @media (max-width: 768px) {
+          font-size: 14px;
+        }
+      }
+      
+      .avatar-format {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+        line-height: 1.5;
+        
+        @media (max-width: 768px) {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+  
+  .basic-form,
+  .password-form {
+    .el-form-item {
+      margin-bottom: 24px;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 20px;
+      }
+      
+      .el-form-item__label {
+        font-weight: 500;
+        color: #1a1a1a;
+        
+        @media (max-width: 768px) {
+          font-size: 14px;
+        }
+      }
+      
+      .el-input,
+      .el-select {
+        .el-input__wrapper {
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            border-color: #1890ff;
+          }
+          
+          &.is-focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+          }
+        }
+      }
+      
+      .el-textarea {
+        .el-textarea__inner {
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            border-color: #1890ff;
+          }
+          
+          &:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+          }
+        }
+      }
+    }
+    
+    .el-form-item:last-child {
+      margin-bottom: 0;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+      
+      .el-button {
+        margin-right: 12px;
+        
+        @media (max-width: 768px) {
+          width: 100%;
+          margin-right: 0;
+          margin-bottom: 12px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+  
+  // 账户信息样式
+  .el-descriptions {
+    .el-descriptions__header {
+      margin-bottom: 0;
+    }
+    
+    .el-descriptions__body {
+      .el-descriptions__table {
+        .el-descriptions__cell {
+          padding: 16px 20px;
+          
+          @media (max-width: 768px) {
+            padding: 12px 16px;
+          }
+          
+          &.el-descriptions__label {
+            font-weight: 500;
+            color: #1a1a1a;
+            background: #fafafa;
+            
+            @media (max-width: 768px) {
+              font-size: 14px;
+            }
+          }
+          
+          &.el-descriptions__content {
+            color: #333;
+            
+            @media (max-width: 768px) {
+              font-size: 14px;
+            }
+            
+            .credit-balance {
+              font-weight: 600;
+              color: #52c41a;
+              font-size: 16px;
+              
+              @media (max-width: 768px) {
+                font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 响应式网格布局 */
+.el-row {
+  margin: 0 !important;
+  
+  .el-col {
+    padding: 0 12px;
+    
+    @media (max-width: 768px) {
+      padding: 0 8px;
+    }
+  }
+}
+
+/* 按钮样式优化 */
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &.el-button--primary {
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+    }
+  }
+}
+
+/* 表单验证样式 */
+.el-form-item.is-error {
+  .el-input__wrapper,
+  .el-textarea__inner {
+    border-color: #ff4d4f;
+    
+    &:hover {
+      border-color: #ff7875;
+    }
+    
+    &.is-focus {
+      border-color: #ff4d4f;
+      box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+    }
+  }
+}
+
+.el-form-item__error {
+  color: #ff4d4f;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+/* 加载状态样式 */
+.el-loading-mask {
+  border-radius: 12px;
+}
+
+/* 动画效果 */
+.profile-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .profile-page {
+    background: #1a1a1a;
+    color: #ffffff;
+    
+    .page-title {
+      color: #ffffff;
+    }
+    
+    .page-description {
+      color: #a0a0a0;
+    }
+    
+    .profile-card {
+      background: #2a2a2a;
+      border-color: #404040;
+      
+      .el-card__header {
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        border-bottom-color: #404040;
+      }
+      
+      .card-title {
+        color: #ffffff;
+      }
+    }
+    
+    .avatar-section {
+      background: #2a2a2a;
+    }
+    
+    .el-descriptions__label {
+      background: #2a2a2a !important;
+      color: #ffffff !important;
+    }
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .profile-page {
+    padding: 0;
+    
+    .el-button {
+      display: none;
+    }
+    
+    .profile-card {
+      box-shadow: none;
+      border: 1px solid #ccc;
+      break-inside: avoid;
+    }
+  }
+} 

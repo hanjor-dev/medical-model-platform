@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗影像模型管理平台 - 主控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 主布局容器 */
+        .main-layout {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+            grid-template-columns: 220px 1fr;
+            grid-template-rows: 64px 1fr;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .main-layout.sidebar-collapsed {
+            grid-template-columns: 70px 1fr;
+        }
+
+        /* 顶部导航栏 */
+        .app-header {
+            grid-area: header;
+            background: #ffffff;
+            border-bottom: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-title-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .product-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            display: block;
+        }
+
+        .system-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+            position: relative;
+        }
+
+        .header-btn:hover {
+            background: #f0f8ff;
+            color: #1890ff;
+        }
+
+
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            position: relative;
+        }
+
+        .user-info:hover {
+            background: #e6f7ff;
+        }
+
+        .user-info.active {
+            background: #d6f0ff;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 160px;
+            background: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.95);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 8px;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-header {
+            padding: 6px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #f5f5f5;
+            border-radius: 8px 8px 0 0;
+        }
+
+
+
+        .dropdown-user-balance {
+            margin-top: 0;
+            padding: 4px 0;
+        }
+
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .balance-value {
+            font-size: 14px;
+            color: #1890ff;
+            font-weight: 600;
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            padding: 4px 0;
+        }
+
+        .dropdown-item {
+            padding: 0;
+        }
+
+        .dropdown-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            border-radius: 4px;
+            margin: 0 4px;
+        }
+
+        .dropdown-link:hover {
+            background: #f0f8ff;
+            color: #1890ff;
+            transform: translateX(2px);
+        }
+
+        .dropdown-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: color 0.2s ease;
+        }
+
+        .dropdown-icon .icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .dropdown-link:hover .dropdown-icon {
+            color: #1890ff;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #f5f5f5;
+            margin: 8px 20px;
+        }
+
+        .dropdown-footer {
+            padding: 10px 20px;
+            border-top: 1px solid #f5f5f5;
+            background: #ffffff;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .logout-btn {
+            width: 75%;
+            padding: 6px 16px;
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 auto;
+            display: block;
+        }
+
+        .logout-btn:hover {
+            background: #ff7875;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 77, 79, 0.2);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .username {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .dropdown-arrow {
+            font-size: 10px;
+            color: #999;
+            margin-left: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .user-info:hover .dropdown-arrow {
+            color: #1890ff;
+        }
+
+        .user-info.active .dropdown-arrow {
+            color: #1890ff;
+            transform: rotate(180deg);
+        }
+
+        /* 侧边栏 */
+        .app-sidebar {
+            grid-area: sidebar;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(24, 144, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .menu-list {
+            list-style: none;
+        }
+
+        .menu-item {
+            margin-bottom: 4px;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border-radius: 0 8px 8px 0;
+            margin-right: 16px;
+            font-weight: 500;
+            background: transparent;
+        }
+
+        .menu-link:hover {
+            background: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+            transform: translateX(6px);
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.15);
+        }
+
+        .menu-link.active {
+            background: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.08);
+        }
+
+        .menu-link.active .menu-title {
+            font-weight: 600 !important;
+        }
+
+        .menu-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #1890ff;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: #4a5568;
+            position: relative;
+        }
+
+        .menu-icon .icon {
+            width: 20px;
+            height: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon .submenu-indicator {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 6px;
+            height: 6px;
+            background: #1890ff;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-collapsed .menu-icon .submenu-indicator {
+            opacity: 1;
+        }
+
+        .menu-link:hover .menu-icon {
+            color: #1890ff;
+        }
+
+        .menu-link.active .menu-icon {
+            color: #1890ff;
+        }
+
+        .menu-title {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-collapsed .menu-title {
+            opacity: 0;
+        }
+
+        .menu-group {
+            cursor: pointer;
+        }
+
+        .menu-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            color: #4a5568;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0 8px 8px 0;
+            margin-right: 16px;
+            font-weight: 500;
+            background: transparent;
+        }
+
+        .menu-header:hover {
+            background: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+            transform: translateX(6px);
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.15);
+        }
+
+        .arrow {
+            margin-left: auto;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .arrow.expanded {
+            transform: rotate(180deg);
+            color: #1890ff;
+        }
+
+        .submenu-list {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(24, 144, 255, 0.02);
+            margin: 0 16px 0 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .submenu-list.open {
+            max-height: 200px;
+        }
+
+        .submenu-item {
+            margin-bottom: 2px;
+        }
+
+        .submenu-link {
+            display: block;
+            padding: 12px 24px 12px 64px;
+            color: #718096;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            font-weight: 400;
+        }
+
+        .submenu-link::before {
+            content: '';
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: #cbd5e0;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .submenu-link:hover {
+            background: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+            padding-left: 68px;
+            transform: translateX(6px);
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.15);
+        }
+
+        .submenu-link:hover::before {
+            background: #1890ff;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .submenu-link.active {
+            background: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 8px rgba(24, 144, 255, 0.08);
+        }
+
+        .submenu-link.active::before {
+            content: '';
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: #1890ff;
+            border-radius: 2px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(24, 144, 255, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .collapse-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(24, 144, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #718096;
+            backdrop-filter: blur(10px);
+        }
+
+        .collapse-btn:hover {
+            background: rgba(24, 144, 255, 0.1);
+            border-color: #1890ff;
+            color: #1890ff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            grid-area: main;
+            padding: 24px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .breadcrumb-nav {
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-item {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .breadcrumb-item:hover {
+            color: #1890ff;
+        }
+
+        .breadcrumb-item.current {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .breadcrumb-separator {
+            color: #ccc;
+        }
+
+        .content-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+            border: 1px solid #e2e8f0;
+            min-height: 400px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .page-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 32px;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e8e8e8;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #1890ff, #52c41a);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1890ff;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 快速操作 */
+        .quick-actions {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #40a9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        /* 内容区域 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        .recent-activity {
+            background: #fafafa;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1890ff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .chart-container {
+            background: #fafafa;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            color: #999;
+        }
+
+        .chart-placeholder i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 200px 1fr;
+            }
+            
+            .main-layout.sidebar-collapsed {
+                grid-template-columns: 70px 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-areas: 
+                    "header"
+                    "main";
+                grid-template-columns: 1fr;
+                grid-template-rows: 56px 1fr;
+            }
+            
+            .app-sidebar {
+                position: fixed;
+                left: -100%;
+                top: 56px;
+                width: 100%;
+                height: calc(100vh - 56px);
+                z-index: 999;
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: #fafbfc;
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .app-sidebar.open {
+                left: 0;
+            }
+            
+            .app-header {
+                padding: 0 16px;
+            }
+            
+            .system-title {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-header {
+                padding: 0 12px;
+            }
+            
+            .main-content {
+                padding: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .sidebar-collapsed .submenu-list {
+            display: none !important;
+        }
+
+        .sidebar-collapsed .submenu-list.open {
+            display: none !important;
+        }
+
+        .sidebar-collapsed .submenu-list.hover-expand {
+            display: block !important;
+            position: absolute;
+            left: 100%;
+            top: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            min-width: 160px;
+            z-index: 1000;
+            margin: 0;
+            padding: 8px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sidebar-collapsed .submenu-list.hover-expand .submenu-item {
+            margin: 0;
+        }
+
+        .sidebar-collapsed .submenu-list.hover-expand .submenu-link {
+            padding: 12px 16px;
+            color: #4a5568;
+            font-size: 14px;
+            border-radius: 0;
+            margin: 0 8px;
+            border-radius: 6px;
+            display: block;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-collapsed .submenu-list.hover-expand .submenu-link:hover {
+            background: rgba(24, 144, 255, 0.08);
+            color: #1890ff;
+            transform: none;
+            padding-left: 16px;
+            box-shadow: none;
+        }
+
+        .sidebar-collapsed .submenu-list.hover-expand .submenu-link::before {
+            display: none;
+        }
+
+        .sidebar-collapsed .arrow {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-layout" id="mainLayout">
+        <!-- 顶部导航栏 -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-section">
+                    <div class="logo">
+                        <svg t="1756299919532" class="logo-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7543" width="32" height="32">
+                            <path d="M486.6048 973.824L102.4 754.2784v-468.992L512 51.2l409.6 234.0352v336.896h-102.4V344.7296l-307.2-175.5648-307.2 175.616v350.1056l332.5952 190.1056-50.7904 88.8832z" fill="#1890ff" p-id="7544"></path>
+                            <path d="M855.04 256l51.2 88.7296-372.48 215.04-1.9456 3.328L153.6 344.7296 204.8 256l325.12 187.648L855.04 256z" fill="#1890ff" p-id="7545"></path>
+                            <path d="M476.16 665.6l102.4 51.2v-204.8h-102.4v153.6z" fill="#1890ff" p-id="7546"></path>
+                            <path d="M849.8176 691.2l76.8 133.0176-76.8 133.0176h-153.6l-76.8-133.0176 76.8-133.0176h153.6z" fill="#52c41a" p-id="7547"></path>
+                        </svg>
+                    </div>
+                    <div class="logo-title-group">
+                        <h1 class="product-name">Model-Y</h1>
+                        <h2 class="system-title">医疗影像模型管理平台</h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button class="header-btn" title="通知中心">
+                    🔔
+                </button>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">
+                        <img src="https://source.theone.art/watermarkResize/0219589797e748ab51b5ad46b8b94ffa/133e0c0c3f32f4b004c7e793273590dd-16588253356290.25.jpg" alt="用户头像" />
+                    </div>
+                    <div class="username">唯一艺术</div>
+                    <div class="dropdown-arrow">▼</div>
+                    
+                    <!-- 用户下拉菜单 -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <!-- 下拉菜单头部 -->
+                        <div class="dropdown-header">
+                            <div class="dropdown-user-balance">
+                                <div class="balance-item">
+                                    <span class="balance-label">通用积分</span>
+                                    <span class="balance-value">1,250</span>
+                                </div>
+                                <div class="balance-item">
+                                    <span class="balance-label">高级积分</span>
+                                    <span class="balance-value">850</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 下拉菜单列表 -->
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-item">
+                                <a href="#" class="dropdown-link" data-action="profile">
+                                    <span class="dropdown-icon">
+                                        <svg t="1756374947026" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6888" width="16" height="16">
+                                            <path d="M128 196.2496a17.0496 17.0496 0 0 0-17.0496 17.1008v597.2992c0 9.4208 7.6288 17.1008 17.0496 17.1008h768c9.4208 0 17.0496-7.68 17.0496-17.1008V213.3504a17.0496 17.0496 0 0 0-17.0496-17.1008h-768z m-68.2496 17.1008c0-37.7344 30.5664-68.3008 68.2496-68.3008h768c37.6832 0 68.2496 30.5664 68.2496 68.3008v597.2992c0 37.7344-30.5664 68.3008-68.2496 68.3008h-768a68.2496 68.2496 0 0 1-68.2496-68.3008V213.3504z m192 234.6496a110.9504 110.9504 0 1 1 187.5456 80.1792 153.5488 153.5488 0 0 1 76.9536 133.12 25.6 25.6 0 0 1-51.2 0 102.4 102.4 0 1 0-204.8 0 25.6 25.6 0 0 1-51.2 0c0-56.8832 30.976-106.5472 76.9536-133.12a110.592 110.592 0 0 1-34.304-80.1792z m110.8992-59.7504a59.7504 59.7504 0 1 0 0 119.5008 59.7504 59.7504 0 0 0 0-119.5008z m209.1008 38.4a25.6 25.6 0 0 1 25.6-25.6H768a25.6 25.6 0 0 1 0 51.2h-170.6496a25.6 25.6 0 0 1-25.6-25.6z m68.2496 145.1008a25.6 25.6 0 1 0 0 51.2H768a25.6 25.6 0 0 0 0-51.2h-128z" fill="currentColor" p-id="6888"></path>
+                                        </svg>
+                                    </span>
+                                    个人信息
+                                </a>
+                            </li>
+
+                            <li class="dropdown-item">
+                                <a href="#" class="dropdown-link" data-action="transactions">
+                                    <span class="dropdown-icon">
+                                        <svg t="1756375077497" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10593" width="16" height="16">
+                                            <path d="M504.576 351.648H272.192c-9.024 0-16.352 7.328-16.352 16.352s7.328 16.352 16.352 16.352h232.384c9.024 0 16.352-7.328 16.352-16.352s-7.328-16.352-16.352-16.352zM693.632 272c0-8.704-7.04-15.744-15.744-15.744H271.616c-8.704 0-15.744 7.04-15.744 15.744s7.04 15.744 15.744 15.744h406.24c8.736 0 15.776-7.04 15.776-15.744zM271.616 672.256c-8.704 0-15.744 7.04-15.744 15.744s7.04 15.744 15.744 15.744h99.648c8.704 0 15.744-7.04 15.744-15.744s-7.04-15.744-15.744-15.744h-99.648z" fill="currentColor" p-id="10594"></path>
+                                            <path d="M192.32 874.144V179.936c0-11.328 8.608-21.216 18.4-21.216h572.352c9.824 0 18.4 9.92 18.4 21.216v269.12H833.6v-269.12c0-29.408-22.656-53.344-50.528-53.344H210.72c-27.872 0-50.528 23.936-50.528 53.344v694.208c0 29.408 22.656 53.344 50.528 53.344h247.808V895.36H210.72c-9.824 0-18.4-9.888-18.4-21.216z" fill="currentColor" p-id="10595"></path>
+                                            <path d="M699.104 486.016c-129.696 0-234.56 107.328-234.56 236.576s104.864 233.76 234.56 233.76 238.08-104.544 238.08-233.76-108.416-236.576-238.08-236.576z m102.688 315.2c8.832 0 16 7.168 16 16s-7.168 16-16 16h-84.896v31.648c0 8.832-7.168 16-16 16s-16-7.168-16-16v-31.648h-84.928c-8.832 0-16-7.168-16-16s7.168-16 16-16h84.928v-33.344h-84.928c-8.832 0-16-7.168-16-16s7.168-16 16-16h83.552L603.2 618.528c-4.96-7.296-3.104-17.248 4.192-22.24 7.264-4.896 17.216-3.136 22.24 4.192l71.264 104.16 71.232-104.16c5.056-7.328 15.072-9.088 22.24-4.192 7.296 4.992 9.152 14.976 4.192 22.24l-80.288 117.344h83.52c8.832 0 16 7.168 16 16s-7.168 16-16 16h-84.896v33.344h84.896zM520.896 464c0-9.024-7.328-16.352-16.352-16.352H272.192c-9.024 0-16.352 7.328-16.352 16.352s7.328 16.352 16.352 16.352h232.384c9.024 0 16.32-7.328 16.32-16.352z" fill="currentColor" p-id="10596"></path>
+                                        </svg>
+                                    </span>
+                                    交易记录
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <a href="#" class="dropdown-link" data-action="referrals">
+                                    <span class="dropdown-icon">
+                                        <svg t="1756375346440" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="22146" width="16" height="16">
+                                            <path d="M0 0h1024v1024H0z" fill="#202425" opacity=".01" p-id="22147"></path>
+                                            <path d="M542.788267 292.522667a34.133333 34.133333 0 0 0-61.610667 0l-60.8256 127.488-140.049067 18.432a34.133333 34.133333 0 0 0-19.0464 58.606933l102.468267 97.28-25.736533 138.888533a34.133333 34.133333 0 0 0 49.834666 36.215467L512 702.0544l124.142933 67.3792a34.133333 34.133333 0 0 0 49.834667-36.215467l-25.7024-138.922666 102.468267-97.245867a34.133333 34.133333 0 0 0-19.0464-58.5728l-140.049067-18.466133-60.859733-127.522134z m-68.8128 173.602133L512 386.4576l37.9904 79.6672a34.133333 34.133333 0 0 0 26.350933 19.114667l87.517867 11.537066-64 60.757334a34.133333 34.133333 0 0 0-10.069333 30.993066l16.042666 86.801067-77.550933-42.120533a34.133333 34.133333 0 0 0-32.5632 0l-77.585067 42.120533 16.0768-86.801067a34.133333 34.133333 0 0 0-10.069333-30.958933l-64-60.757333 87.483733-11.537067a34.133333 34.133333 0 0 0 26.350934-19.1488z" fill="currentColor" p-id="22148"></path>
+                                            <path d="M102.4 34.133333a34.133333 34.133333 0 0 0-34.133333 34.133334v136.533333a34.133333 34.133333 0 0 0 34.133333 34.133333h34.133333v473.361067a102.4 102.4 0 0 0 49.732267 87.790933l273.066667 163.84a102.4 102.4 0 0 0 105.3696 0l273.066666-163.84A102.4 102.4 0 0 0 887.466667 712.2944V238.933333h34.133333a34.133333 34.133333 0 0 0 34.133333-34.133333V68.266667a34.133333 34.133333 0 0 0-34.133333-34.133334H102.4z m102.4 678.161067V238.933333h614.4v473.361067a34.133333 34.133333 0 0 1-16.554667 29.252267l-273.066666 163.84a34.133333 34.133333 0 0 1-35.157334 0l-273.066666-163.84A34.133333 34.133333 0 0 1 204.8 712.2944zM887.466667 102.4v68.266667H136.533333V102.4h750.933334z" fill="currentColor" p-id="22149"></path>
+                                        </svg>
+                                    </span>
+                                    我的引荐
+                                </a>
+                            </li>
+                            <li class="dropdown-item">
+                                <a href="#" class="dropdown-link" data-action="settings">
+                                    <span class="dropdown-icon">
+                                        <svg t="1756375376568" class="icon" viewBox="0 0 1084 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="23137" width="16" height="16">
+                                            <path d="M1072.147851 406.226367c-6.331285-33.456782-26.762037-55.073399-52.047135-55.073399-0.323417 0-0.651455 0.003081-0.830105 0.009241l-4.655674 0c-73.124722 0-132.618162-59.491899-132.618162-132.618162 0-23.731152 11.447443-50.336101 11.546009-50.565574 13.104573-29.498767 3.023185-65.672257-23.427755-84.127081l-1.601687-1.127342-134.400039-74.661726-1.700252-0.745401c-8.753836-3.805547-18.334698-5.735272-28.479231-5.735272-20.789593 0-41.235746 8.344174-54.683758 22.306575-14.741683 15.216028-65.622973 58.649474-104.721083 58.649474-39.450789 0-90.633935-44.286652-105.438762-59.784516-13.518857-14.247316-34.128258-22.753199-55.127302-22.753199-9.945862 0-19.354234 1.861961-27.958682 5.531982l-1.746455 0.74078-139.141957 76.431283-1.643269 1.139662c-26.537186 18.437884-36.675557 54.579032-23.584845 84.062398 0.115506 0.264895 11.579891 26.725075 11.579891 50.634877 0 73.126262-59.491899 132.618162-132.618162 132.618162l-4.581749 0c-0.318797-0.00616-0.636055-0.01078-0.951772-0.01078-25.260456 0-45.672728 21.618157-52.002472 55.0811-0.462025 2.453354-11.313456 60.622322-11.313456 106.117939 0 45.494078 10.85143 103.659965 11.314996 106.119479 6.334365 33.458322 26.758957 55.076479 52.036353 55.076479 0.320337 0 0.651455-0.00616 0.842426-0.012321l4.655674 0c73.126262 0 132.618162 59.491899 132.618162 132.616622 0 23.760413-11.444363 50.333021-11.546009 50.565574-13.093793 29.474125-3.041666 65.646075 23.395414 84.151722l1.569346 1.093459 131.838879 73.726895 1.675611 0.7377c8.750757 3.84251 18.305437 5.790715 28.397607 5.790715 21.082208 0 41.676209-8.706094 55.0888-23.290689 18.724339-20.347588 69.527086-62.362616 107.04815-62.362616 40.625872 0 92.72537 47.100385 107.759669 63.583903 13.441852 14.831008 34.176001 23.689571 55.470741 23.695731l0.00616 0c9.895039 0 19.27877-1.883523 27.893999-5.598205l1.711034-0.73924 136.659342-75.531873 1.617088-1.128882c26.492523-18.456365 36.601633-54.600594 23.538642-84.016195-0.115506-0.267974-11.595291-27.082374-11.595291-50.67646 0-73.124722 59.49344-132.616622 132.618162-132.616622l4.517066-0.00154c0.300316 0.00616 0.599092 0.009241 0.899409 0.009241 25.331299-0.00154 45.785153-21.619697 52.107197-55.054918 0.112426-0.589852 11.325776-59.507301 11.325776-106.14104C1083.464388 466.640776 1072.609877 408.67356 1072.147851 406.226367zM377.486862 945.656142l-115.32764-64.487932c5.082277-13.052211 15.437801-43.51815 15.437801-75.017486 0-109.382917-84.176364-199.816642-192.587488-208.134635-2.647404-15.427021-8.873963-54.967133-8.873963-85.667166 0-30.65691 6.223479-70.232445 8.869343-85.671786 108.415744-8.311832 192.592108-98.745557 192.592108-208.134635 0-31.416171-10.300081-61.797405-15.371577-74.854236l122.721583-67.40331c0.003081 0 0.00462 0.00154 0.007701 0.00154 4.423121 4.518606 22.121764 22.080182 46.558275 39.493911 39.929754 28.46229 77.952885 42.894416 113.014434 42.894416 34.716571 0 72.437845-14.151831 112.115025-42.06431 24.282503-17.07953 41.896442-34.302288 46.308782-38.74543 0.009241-0.00154 0.018481-0.00462 0.026182-0.00616l118.301542 65.726159c-5.077657 13.055291-15.416239 43.499669-15.416239 74.958962 0 109.389077 84.174824 199.822802 192.590568 208.134635 2.645865 15.462442 8.872423 55.107281 8.872423 85.671786 0 30.687711-6.223479 70.241685-8.869343 85.673326C890.042174 606.334084 805.86427 696.767809 805.86427 806.158426c0 31.450053 10.317022 61.851309 15.393138 74.903519l-119.783103 66.198965c-5.168521-5.490399-22.603811-23.363073-46.740005-41.288109-40.701336-30.224145-79.662378-45.549521-115.800446-45.549521-35.79155 0-74.458435 15.038919-114.927219 44.694774C400.22004 922.554885 382.666163 940.255068 377.486862 945.656142zM731.271848 511.646647c0-105.803762-86.081448-191.88059-191.888289-191.88059-105.803762 0-191.88059 86.076827-191.88059 191.88059 0 105.803762 86.076827 191.882129 191.88059 191.882129C645.19194 703.528777 731.271848 617.450409 731.271848 511.646647zM539.383558 395.903184c63.825696 0 115.751164 51.922387 115.751164 115.743463 0 63.825696-51.925468 115.751164-115.751164 115.751164-63.821076 0-115.743463-51.925468-115.743463-115.751164C423.640095 447.824031 475.562482 395.903184 539.383558 395.903184z" fill="currentColor" p-id="23138"></path>
+                                        </svg>
+                                    </span>
+                                    账户设置
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <!-- 下拉菜单底部 -->
+                        <div class="dropdown-footer">
+                            <button class="logout-btn" id="logoutBtn">
+                                退出登录
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 侧边栏 -->
+        <aside class="app-sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="#" class="menu-link active">
+                            <span class="menu-icon">
+                                <svg t="1756387085906" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="46943" width="20" height="20">
+                                    <path d="M810.666667 213.333333l-85.333334-54.186666V42.666667h85.333334zM810.666667 512h85.333333v-53.717333l-384-268.8-384 268.8V512h85.333333v384h128v-61.056a170.666667 170.666667 0 1 1 341.333334 0V896h128v-384z m85.333333 469.333333h-298.666667v-146.389333a85.333333 85.333333 0 1 0-170.666666 0V981.333333H128v-384H42.666667V413.866667L512 85.333333l469.333333 328.533334V597.333333h-85.333333v384z" fill="currentColor" p-id="46944"></path>
+                                </svg>
+                            </span>
+                                <span class="menu-title">控制台</span>
+                            </a>
+                        </li>
+                        
+                        <li class="menu-item">
+                        <div class="menu-group" id="systemMenu">
+                            <div class="menu-header" id="systemMenuHeader">
+                                <span class="menu-icon">
+                                    <svg t="1756385868560" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="25704" width="20" height="20">
+                                        <path d="M796.601376 533.883517c29.17676 9.213714 56.306028 25.081776 79.340312 45.556695-16.891808 45.044822 5.630603 95.208374 50.675425 112.612055 6.142476 2.047492 12.284951 4.094984 18.427427 4.606857 6.142476 29.688633 6.142476 60.912884 0 90.601517-47.604187 6.654349-80.875931 51.187298-73.709709 98.791485 1.023746 6.654349 2.559365 13.308697 5.11873 19.451173-23.034284 20.474919-49.651679 35.831109-79.340312 45.556695-30.200506-37.366727-85.482787-42.99733-122.849515-12.284951-5.11873 4.094984-9.725587 8.701841-13.82057 13.82057-29.17676-9.213714-56.306028-25.081776-79.340312-45.556695 18.427427-44.532949-3.071238-95.208374-47.092314-113.635801-6.654349-2.559365-13.308697-4.606857-19.963046-5.630603-6.142476-29.688633-6.142476-60.912884 0-90.601517 47.604187-7.166222 80.364058-51.699171 72.685963-99.303358-1.023746-6.142476-2.559365-11.773079-4.606857-17.915554 22.522411-20.474919 49.139806-35.831109 78.316566-45.556695 30.200506 37.366727 84.970914 42.99733 122.337642 12.796824 4.606857-4.094984 9.213714-8.189968 12.796824-12.796824M660.443164 460.685681c-7.678095-1.023746-15.356189-1.023746-22.522411 0-38.902346 12.796824-74.733455 33.271744-105.445834 60.912884-23.546157 20.986792-30.712379 54.770409-18.427427 83.435296 3.071238 7.166222-0.511873 15.356189-7.678095 17.915554-1.023746 0.511873-2.047492 0.511873-3.583111 1.023746-30.712379 4.094984-55.794155 27.129268-62.448503 57.841647-8.701841 40.949838-9.213714 82.923423 0 123.873261 6.142476 29.688633 30.200506 52.211044 59.889138 57.329773 7.678095 0.511873 13.82057 6.654349 13.308698 14.332444v1.535618c-10.749333 28.153014-3.071238 60.401011 19.963046 80.364058 30.712379 27.641141 66.543487 48.11606 105.445834 60.912885 28.664887 9.213714 59.889139 0.511873 79.340311-22.522411 4.606857-6.142476 13.308697-7.166222 19.451174-2.559365 1.023746 0.511873 1.535619 1.535619 2.559365 2.559365 19.451173 23.034284 50.675425 32.247998 78.828438 22.522411 38.902346-12.796824 74.733455-33.271744 105.445834-60.912885 22.522411-19.963046 30.712379-52.211044 19.963046-80.364058-3.071238-7.166222 0.511873-15.356189 7.678095-17.915554 1.023746-0.511873 2.047492-0.511873 3.583111-1.023746 30.200506-4.606857 54.258536-27.129268 60.912884-57.329773 8.189968-39.926092 8.189968-80.875931 0-120.802023-6.142476-30.712379-31.736125-54.258536-62.960376-57.841647-7.678095-1.023746-12.796824-8.189968-11.773079-15.868062 0-1.023746 0.511873-2.047492 1.023746-3.583111 10.23746-28.153014 2.559365-59.889139-19.963046-79.852185-30.712379-27.641141-66.543487-48.11606-105.445834-60.912884-28.664887-9.213714-59.889139-0.511873-79.340311 22.522411-4.606857 6.142476-13.308697 7.166222-19.451174 2.559365-1.023746-0.511873-1.535619-1.535619-2.559364-2.559365-13.82057-15.868062-34.29549-25.593649-55.794155-25.593649" p-id="25705"></path><path d="M728.52227 705.360965c19.963046 0 36.854854 16.379935 36.854854 36.854854s-16.379935 36.854854-36.854854 36.854855-36.854854-16.379935-36.854854-36.854855c0.511873-20.474919 16.891808-36.854854 36.854854-36.854854m0-73.197836c-60.912884 0-110.05269 49.139806-110.05269 110.05269s49.139806 110.05269 110.05269 110.052691 110.05269-49.139806 110.05269-110.052691-49.139806-110.05269-110.05269-110.05269M660.443164 183.250526c0 20.474919 16.379935 36.854854 36.854854 36.854855s36.854854-16.379935 36.854855-36.854855c0-19.963046-16.379935-36.854854-36.854855-36.854854s-36.854854 16.379935-36.854854 36.854854" p-id="25706"></path><path d="M400.411691 659.292397c20.474919 0 36.854854-16.379935 36.854854-36.854855s-16.379935-36.854854-36.854854-36.854854H74.348603V365.98918h732.490233v36.854854c0 20.474919 16.379935 36.854854 36.854854 36.854855 19.963046 0 36.854854-16.379935 36.854855-36.854855V73.197836C880.548545 36.342981 852.907404 4.606857 816.564422 0H65.646763C28.791908 4.606857 1.150767 35.831109 1.150767 73.197836v805.688068C0.638894 916.252632 28.791908 947.476884 65.646763 952.08374h338.348038c20.474919 0 36.854854-16.379935 36.854855-36.854854s-16.379935-36.854854-36.854855-36.854855H106.084728c-18.9393-1.535619-32.759871-17.915554-31.736125-36.854854v-183.250526h326.063088zM74.348603 110.05269c-1.023746-18.9393 12.796824-34.807363 31.736125-36.854854h669.529856c18.9393 1.535619 32.759871 17.915554 31.736125 36.854854v183.250527H74.348603V110.05269z" p-id="25707"></path>
+                                    </svg>
+                                    <span class="submenu-indicator"></span>
+                                </span>
+                                <span class="menu-title">系统管理</span>
+                                    <span class="arrow">▼</span>
+                                </div>
+                        <ul class="submenu-list" id="systemSubmenu">
+                                    <li class="submenu-item">
+                                <a href="#" class="submenu-link">系统配置</a>
+                                    </li>
+                                    <li class="submenu-item">
+                                <a href="#" class="submenu-link">字典数据</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        
+                        <li class="menu-item">
+                    <div class="menu-group" id="userMenu">
+                        <div class="menu-header" id="userMenuHeader">
+                            <span class="menu-icon">
+                                <svg t="1756386116631" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="35353" width="20" height="20">
+                                    <path d="M706.816 629.12a383.872 383.872 0 0 0-123.584-75.968 255.68 255.68 0 0 0 81.216-352.832 255.68 255.68 0 0 0-352.832-81.152A255.68 255.68 0 0 0 230.4 471.936c20.416 32.832 48.448 60.8 81.216 81.216A384.32 384.32 0 0 0 64 895.552c-0.384 8.768 6.4 16.384 15.232 16.768h32.768a16.192 16.192 0 0 0 16-15.168 320.128 320.128 0 0 1 534.848-221.632c6.4 5.632 16 5.632 21.952-0.384l22.848-23.168a16 16 0 0 0-0.832-22.848z m-259.2-101.12a192 192 0 1 1 192-192 192.576 192.576 0 0 1-192 192z m496 224h-24v-34.048c0-47.616-38.4-86.016-86.016-86.016h-3.968c-47.616 0-86.016 38.4-86.016 86.016v33.984h-24a16 16 0 0 0-16 16v160c0 8.832 7.232 16 16 16h224a16 16 0 0 0 16-16V768a16 16 0 0 0-16-16z m-152-34.048c0-20.8 17.216-38.016 38.016-38.016h3.968c20.8 0 38.016 17.216 38.016 38.016v33.984h-80v-33.984z m120 177.984h-160v-96h160V896z" fill="currentColor" p-id="35354"></path>
+                                </svg>
+                                <span class="submenu-indicator"></span>
+                            </span>
+                            <span class="menu-title">用户权限</span>
+                            <span class="arrow">▼</span>
+                </div>
+                        <ul class="submenu-list" id="userSubmenu">
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link">用户列表</a>
+                        </li>
+                            <li class="submenu-item">
+                                <a href="#" class="submenu-link">角色权限</a>
+                        </li>
+                    </ul>
+                </div>
+                </li>
+
+                        <li class="menu-item">
+                            <a href="#" class="menu-link">
+                        <span class="menu-icon">
+                            <svg t="1756386166848" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="37261" width="20" height="20">
+                                <path d="M175.104 518.656h120.32v134.656H175.104zM729.088 303.104h120.32v350.72h-120.32z" fill="currentColor" p-id="37262"></path><path d="M957.44 28.672H66.56c-36.864 0-66.56 29.696-66.56 66.56v623.104c0 36.864 29.696 66.56 66.56 66.56h890.88c36.864 0 66.56-29.696 66.56-66.56V95.232c0-36.864-29.696-66.56-66.56-66.56z m0 667.648c0 12.288-9.728 22.016-22.016 22.016H89.088c-12.288 0-22.016-9.728-22.016-22.016V117.76c0-12.288 9.728-22.016 22.016-22.016h845.824c12.288 0 22.016 9.728 22.016 22.016v578.56z" fill="currentColor" p-id="37263"></path><path d="M344.064 410.624h120.32v242.688H344.064zM536.576 195.072h120.32v458.752h-120.32z" fill="currentColor" p-id="37264"></path>
+                            </svg>
+                        </span>
+                                <span class="menu-title">数据统计</span>
+                            </a>
+                        </li>
+                    </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="collapse-btn" id="collapseBtn" title="折叠侧边栏">
+                    ◀
+                </button>
+            </div>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 内容包装器 -->
+            <div class="content-wrapper fade-in">
+            <!-- 这里只保留容器边框，内容已清空 -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 侧边栏折叠/展开功能
+        const mainLayout = document.getElementById('mainLayout');
+        const sidebar = document.getElementById('sidebar');
+        const collapseBtn = document.getElementById('collapseBtn');
+
+        // 折叠/展开侧边栏
+        collapseBtn.addEventListener('click', function() {
+            // 先关闭所有展开的二级菜单
+            const allSubmenus = document.querySelectorAll('.submenu-list');
+            const allArrows = document.querySelectorAll('.arrow');
+            
+            allSubmenus.forEach(submenu => {
+                submenu.classList.remove('open');
+            });
+            
+            allArrows.forEach(arrow => {
+                arrow.classList.remove('expanded');
+            });
+            
+            // 然后折叠侧边栏
+            mainLayout.classList.toggle('sidebar-collapsed');
+            const isCollapsed = mainLayout.classList.contains('sidebar-collapsed');
+            this.innerHTML = isCollapsed ? '▶' : '◀';
+            this.setAttribute('title', isCollapsed ? '展开侧边栏' : '折叠侧边栏');
+        });
+
+
+
+        // 子菜单展开/折叠
+        const userMenu = document.getElementById('userMenu');
+        const userSubmenu = document.getElementById('userSubmenu');
+    const userArrow = userMenu.querySelector('.arrow');
+
+    const systemMenu = document.getElementById('systemMenu');
+    const systemSubmenu = document.getElementById('systemSubmenu');
+    const systemArrow = systemMenu.querySelector('.arrow');
+
+    userMenu.addEventListener('click', function(e) {
+        // 如果点击的是子菜单项，不处理父菜单的展开/折叠
+        if (e.target.closest('.submenu-link')) {
+            return;
+        }
+        
+            userSubmenu.classList.toggle('open');
+        userArrow.classList.toggle('expanded');
+    });
+
+    systemMenu.addEventListener('click', function(e) {
+        // 如果点击的是子菜单项，不处理父菜单的展开/折叠
+        if (e.target.closest('.submenu-link')) {
+            return;
+        }
+        
+        systemSubmenu.classList.toggle('open');
+        systemArrow.classList.toggle('expanded');
+        });
+
+        // 菜单项点击高亮
+        const menuLinks = document.querySelectorAll('.menu-link');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 移除所有active类
+                menuLinks.forEach(l => l.classList.remove('active'));
+            submenuLinks.forEach(l => l.classList.remove('active'));
+                // 添加active类到当前点击的链接
+                this.classList.add('active');
+            });
+        });
+
+        // 子菜单项点击
+        const submenuLinks = document.querySelectorAll('.submenu-link');
+        submenuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+            e.stopPropagation(); // 阻止事件冒泡到父菜单
+            
+                // 移除所有active类
+                menuLinks.forEach(l => l.classList.remove('active'));
+                submenuLinks.forEach(l => l.classList.remove('active'));
+            
+                // 添加active类到当前点击的链接
+                this.classList.add('active');
+            
+            // 确保父菜单保持展开状态
+            const parentMenu = this.closest('.menu-group');
+            if (parentMenu) {
+                const submenu = parentMenu.querySelector('.submenu-list');
+                const arrow = parentMenu.querySelector('.arrow');
+                if (submenu && !submenu.classList.contains('open')) {
+                    submenu.classList.add('open');
+                    arrow.classList.add('expanded');
+                }
+            }
+            });
+        });
+
+    // 页面加载时设置默认选中状态（控制台）
+    window.addEventListener('load', function() {
+        // 移除所有active类
+        menuLinks.forEach(l => l.classList.remove('active'));
+        submenuLinks.forEach(l => l.classList.remove('active'));
+        
+        // 默认选中控制台
+        const consoleLink = document.querySelector('.menu-link');
+        if (consoleLink) {
+            consoleLink.classList.add('active');
+        }
+        });
+
+        // 响应式处理
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        // 点击外部关闭移动端菜单
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // 头像处理函数
+        function updateUserAvatar(username) {
+            // 现在使用图片头像，不需要处理文字
+        }
+
+                // 用户下拉菜单处理
+        function initUserDropdown() {
+            const userInfo = document.getElementById('userInfo');
+            const userDropdown = document.getElementById('userDropdown');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // 点击用户信息显示/隐藏下拉菜单
+            userInfo.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isVisible = userDropdown.classList.contains('show');
+                
+                if (isVisible) {
+                    userDropdown.classList.remove('show');
+                    userInfo.classList.remove('active');
+                } else {
+                    userDropdown.classList.add('show');
+                    userInfo.classList.add('active');
+                }
+            });
+            
+            // 点击其他地方隐藏下拉菜单
+            document.addEventListener('click', function(e) {
+                if (!userInfo.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                    userInfo.classList.remove('active');
+                }
+            });
+            
+            // 菜单项点击事件
+            const dropdownLinks = document.querySelectorAll('.dropdown-link');
+            dropdownLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const action = this.getAttribute('data-action');
+                    handleMenuAction(action);
+                    userDropdown.classList.remove('show');
+                    userInfo.classList.remove('active');
+                });
+            });
+            
+            // 退出登录按钮
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleLogout();
+            });
+        }
+
+        // 处理菜单项点击
+        function handleMenuAction(action) {
+            switch(action) {
+                case 'profile':
+                    alert('个人信息功能：在实际项目中会跳转到个人信息页面');
+                    break;
+
+                case 'transactions':
+                    alert('交易记录功能：在实际项目中会跳转到交易记录页面');
+                    break;
+                case 'referrals':
+                    alert('我的引荐功能：在实际项目中会跳转到引荐页面');
+                    break;
+                case 'settings':
+                    alert('账户设置功能：在实际项目中会跳转到账户设置页面');
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // 处理退出登录
+        function handleLogout() {
+            if (confirm('确定要退出登录吗？')) {
+                alert('退出登录功能：在实际项目中会清除用户会话并跳转到登录页面');
+                // 这里可以添加实际的退出登录逻辑
+                // 例如：清除localStorage、跳转到登录页等
+            }
+        }
+
+        // 页面加载动画
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+            
+            // 初始化头像显示
+            updateUserAvatar('张医生');
+            
+            // 初始化用户下拉菜单
+            initUserDropdown();
+            
+            // 初始化悬停展开功能
+            initHoverExpand();
+        });
+
+        // 模拟数据更新
+        setInterval(() => {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach((stat, index) => {
+                const currentValue = parseInt(stat.textContent.replace(/[^\d]/g, ''));
+                const newValue = currentValue + Math.floor(Math.random() * 10);
+                stat.textContent = stat.textContent.replace(/\d+/, newValue);
+            });
+        }, 8000);
+
+        // 添加一些交互效果
+        const actionBtns = document.querySelectorAll('.action-btn');
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // 统计卡片悬停效果
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
+
+
+
+        // 悬停展开功能（折叠状态下）
+        function initHoverExpand() {
+            const systemMenu = document.getElementById('systemMenu');
+            const userMenu = document.getElementById('userMenu');
+            const systemSubmenu = document.getElementById('systemSubmenu');
+            const userSubmenu = document.getElementById('userSubmenu');
+            
+            if (!systemMenu || !userMenu || !systemSubmenu || !userSubmenu) {
+                return;
+            }
+            
+            let hoverTimeout;
+            
+            // 检查侧边栏状态的函数
+            function isSidebarCollapsed() {
+                return mainLayout.classList.contains('sidebar-collapsed');
+            }
+            
+            // 系统管理悬停展开
+            systemMenu.addEventListener('mouseenter', function() {
+                if (isSidebarCollapsed()) {
+                    clearTimeout(hoverTimeout);
+                    systemSubmenu.classList.add('hover-expand');
+                }
+            });
+            
+            systemMenu.addEventListener('mouseleave', function() {
+                if (isSidebarCollapsed()) {
+                    hoverTimeout = setTimeout(() => {
+                        systemSubmenu.classList.remove('hover-expand');
+                    }, 300);
+                }
+            });
+            
+            // 用户权限悬停展开
+            userMenu.addEventListener('mouseenter', function() {
+                if (isSidebarCollapsed()) {
+                    clearTimeout(hoverTimeout);
+                    userSubmenu.classList.add('hover-expand');
+                }
+            });
+            
+            userMenu.addEventListener('mouseleave', function() {
+                if (isSidebarCollapsed()) {
+                    hoverTimeout = setTimeout(() => {
+                        userSubmenu.classList.remove('hover-expand');
+                    }, 300);
+                }
+            });
+            
+            // 子菜单悬停保持展开
+            systemSubmenu.addEventListener('mouseenter', function() {
+                if (isSidebarCollapsed()) {
+                    clearTimeout(hoverTimeout);
+                }
+            });
+            
+            systemSubmenu.addEventListener('mouseleave', function() {
+                if (isSidebarCollapsed()) {
+                    hoverTimeout = setTimeout(() => {
+                        systemSubmenu.classList.remove('hover-expand');
+                    }, 300);
+                }
+            });
+            
+            userSubmenu.addEventListener('mouseenter', function() {
+                if (isSidebarCollapsed()) {
+                    clearTimeout(hoverTimeout);
+                }
+            });
+            
+            userSubmenu.addEventListener('mouseleave', function() {
+                if (isSidebarCollapsed()) {
+                    hoverTimeout = setTimeout(() => {
+                        userSubmenu.classList.remove('hover-expand');
+                    }, 300);
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

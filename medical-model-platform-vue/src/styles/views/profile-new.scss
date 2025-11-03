@@ -1,0 +1,747 @@
+/**
+ * 新设计风格个人信息页面样式
+ * 
+ * @author hanjor
+ * @version 2.0
+ * @date 2025-01-15 20:10:00
+ */
+
+.profile-page-new {
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+/* 顶部横幅区域 */
+.hero-section {
+  position: relative;
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  padding: 60px 0 40px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 24px;
+    }
+  }
+  
+  .avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .avatar-container {
+      position: relative;
+      
+      .hero-avatar {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: scale(1.05);
+          border-color: rgba(255, 255, 255, 0.5);
+        }
+      }
+      
+      .avatar-overlay {
+        position: absolute;
+        bottom: -8px;
+        right: -8px;
+        
+        .avatar-uploader {
+          .el-upload {
+            display: block;
+          }
+        }
+      }
+    }
+    
+    .user-identity {
+      .user-name {
+        font-size: 32px;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 8px 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        
+        @media (max-width: 768px) {
+          font-size: 28px;
+        }
+      }
+      
+      .user-role {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0 0 12px 0;
+        
+        @media (max-width: 768px) {
+          font-size: 14px;
+        }
+      }
+      
+      .user-status {
+        .el-tag {
+          border: none;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .edit-btn {
+      background: linear-gradient(135deg, #52C41A 0%, #389E0D 100%);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 12px 24px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(82, 196, 26, 0.3);
+      }
+    }
+    
+    .settings-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 12px 24px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+/* 主要内容区域 */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0 16px;
+    gap: 20px;
+  }
+}
+
+/* 左侧信息面板 */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 信息卡片通用样式 */
+.info-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-header {
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    @media (max-width: 768px) {
+      padding: 20px 20px 16px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+      
+      .el-icon {
+        font-size: 20px;
+        color: #4A90E2;
+      }
+    }
+    
+    .completion-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      .completion-text {
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+      }
+      
+      .completion-progress {
+        width: 80px;
+        
+        .el-progress-bar__outer {
+          background: #f0f0f0;
+        }
+        
+        .el-progress-bar__inner {
+          background: linear-gradient(90deg, #52C41A 0%, #4A90E2 100%);
+        }
+      }
+      
+      .completion-percentage {
+        font-size: 14px;
+        font-weight: 600;
+        color: #4A90E2;
+        min-width: 40px;
+      }
+    }
+  }
+  
+  .card-content {
+    padding: 24px;
+    
+    @media (max-width: 768px) {
+      padding: 20px;
+    }
+  }
+}
+
+/* 基本信息表单 */
+.basic-info {
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    &.is-editing {
+      .info-input,
+      .info-select,
+      .info-textarea {
+        border-color: #4A90E2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+      }
+    }
+    
+    .info-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+    }
+    
+    .info-value {
+      .info-input,
+      .info-select {
+        .el-input__wrapper {
+          border-radius: 8px;
+          border: 1px solid #e8e8e8;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            border-color: #4A90E2;
+          }
+          
+          &.is-focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+          }
+        }
+      }
+      
+      .info-textarea {
+        .el-textarea__inner {
+          border-radius: 8px;
+          border: 1px solid #e8e8e8;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            border-color: #4A90E2;
+          }
+          
+          &:focus {
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 联系方式卡片 */
+.contact-info {
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: #f0f0f0;
+      }
+      
+      .contact-icon {
+        width: 40px;
+        height: 40px;
+        background: #4A90E2;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        
+        .el-icon {
+          font-size: 18px;
+        }
+      }
+      
+      .contact-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        .contact-label {
+          font-size: 12px;
+          color: #999;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        
+        .contact-value {
+          font-size: 14px;
+          color: #1a1a1a;
+          font-weight: 500;
+        }
+      }
+      
+      .contact-actions {
+        .el-button {
+          color: #4A90E2;
+          
+          &:hover {
+            color: #357ABD;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 右侧功能面板 */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 功能卡片通用样式 */
+.function-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin: 0;
+      
+      .el-icon {
+        font-size: 18px;
+        color: #4A90E2;
+      }
+    }
+  }
+  
+  .card-content {
+    padding: 20px;
+  }
+}
+
+/* 安全设置卡片 */
+.security-card {
+  .security-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .security-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      
+      .security-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        .security-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #1a1a1a;
+        }
+        
+        .security-desc {
+          font-size: 12px;
+          color: #999;
+        }
+      }
+      
+      .el-button {
+        border-radius: 6px;
+        font-weight: 500;
+      }
+      
+      .el-switch {
+        .el-switch__core {
+          border-color: #d9d9d9;
+          
+          &.is-checked {
+            background: #4A90E2;
+            border-color: #4A90E2;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 账户状态卡片 */
+.account-card {
+  .account-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: #f0f0f0;
+        transform: translateY(-2px);
+      }
+      
+      .stat-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #4A90E2;
+        margin-bottom: 8px;
+      }
+      
+      .stat-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}
+
+/* 快捷操作卡片 */
+.quick-actions {
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+    
+    .action-btn {
+      height: 48px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: #f0f0f0;
+        transform: translateY(-2px);
+      }
+      
+      .el-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+/* 密码修改弹窗 */
+.el-dialog {
+  .el-dialog__header {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 20px 24px;
+    
+    .el-dialog__title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+  }
+  
+  .el-dialog__body {
+    padding: 24px;
+  }
+  
+  .el-dialog__footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 20px 24px;
+  }
+}
+
+/* 密码强度指示器 */
+.password-strength {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .strength-bar {
+    flex: 1;
+    height: 4px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    overflow: hidden;
+    
+    .strength-fill {
+      height: 100%;
+      transition: all 0.3s ease;
+      
+      &.weak {
+        background: #ff4d4f;
+      }
+      
+      &.medium {
+        background: #faad14;
+      }
+      
+      &.strong {
+        background: #52c41a;
+      }
+    }
+  }
+  
+  .strength-text {
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 30px;
+  }
+}
+
+/* 响应式适配 */
+@media (max-width: 1200px) {
+  .main-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 0 32px;
+    margin-bottom: 24px;
+  }
+  
+  .info-card,
+  .function-card {
+    border-radius: 12px;
+  }
+  
+  .info-grid {
+    gap: 16px;
+  }
+  
+  .contact-item {
+    padding: 12px;
+  }
+  
+  .stat-item {
+    padding: 12px;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .profile-page-new {
+    background: #1a1a1a;
+    
+    .hero-section {
+      background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    }
+    
+    .info-card,
+    .function-card {
+      background: #2a2a2a;
+      border: 1px solid #404040;
+    }
+    
+    .contact-item,
+    .stat-item {
+      background: #333;
+      
+      &:hover {
+        background: #404040;
+      }
+    }
+    
+    .card-header {
+      border-bottom-color: #404040;
+    }
+    
+    .info-label,
+    .contact-label,
+    .stat-label {
+      color: #a0a0a0;
+    }
+    
+    .contact-value,
+    .stat-value {
+      color: #ffffff;
+    }
+  }
+}
+
+/* 动画效果 */
+.info-card,
+.function-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的引荐 - 医疗影像模型管理平台</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* 全局样式重置 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* GitHub风格变量定义 */
+    :root {
+      /* 颜色系统 */
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f6f8fa;
+      --color-bg-tertiary: #fafbfc;
+      --color-border-primary: #d0d7de;
+      --color-border-secondary: #e1e4e8;
+      --color-text-primary: #24292f;
+      --color-text-secondary: #656d76;
+      --color-text-tertiary: #8c959f;
+      --color-accent-primary: #0969da;
+      --color-accent-secondary: #1f883d;
+      --color-accent-danger: #cf222e;
+      --color-accent-warning: #9a6700;
+      
+      /* 阴影系统 */
+      --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+      --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      
+      /* 圆角系统 */
+      --border-radius: 6px;
+      --border-radius-large: 12px;
+      
+      /* 字体系统 */
+      --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      --font-size-small: 12px;
+      --font-size-base: 14px;
+      --font-size-large: 16px;
+      --font-size-xl: 20px;
+      --font-size-2xl: 24px;
+      
+      /* 间距系统 */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+    }
+
+    /* 深色模式支持 */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg-primary: #0d1117;
+        --color-bg-secondary: #161b22;
+        --color-bg-tertiary: #21262d;
+        --color-border-primary: #30363d;
+        --color-border-secondary: #21262d;
+        --color-text-primary: #f0f6fc;
+        --color-text-secondary: #c9d1d9;
+        --color-text-tertiary: #8b949e;
+      }
+    }
+
+    /* 基础样式 */
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      font-size: var(--font-size-base);
+    }
+
+    /* GitHub风格主布局 */
+    .referral-page-github {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      height: 100vh;
+      background: var(--color-bg-primary);
+    }
+
+    /* 左侧导航栏 */
+    .sidebar-nav {
+      background: var(--color-bg-secondary);
+      border-right: 1px solid var(--color-border-primary);
+      overflow: hidden;
+    }
+
+    .nav-header {
+      padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+      border-bottom: 1px solid var(--color-border-primary);
+    }
+
+    .nav-title {
+      font-size: var(--font-size-large);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .nav-menu {
+      padding: var(--spacing-xs) 0;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: var(--spacing-xs) var(--spacing-md);
+      margin: 0 var(--spacing-sm);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--color-bg-tertiary);
+    }
+
+    .nav-item.active {
+      background: var(--color-accent-primary);
+      color: #ffffff;
+    }
+
+    .nav-item.active .nav-icon,
+    .nav-item.active .nav-text {
+      color: #ffffff;
+    }
+
+    .nav-icon {
+      font-size: var(--font-size-large);
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+
+    .nav-text {
+      flex: 1;
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    /* 右侧内容区域 */
+    .content-area {
+      overflow: hidden;
+      padding: 0;
+      height: 100%;
+    }
+
+    .content-page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--spacing-md);
+      height: 100%;
+      overflow: auto;
+    }
+
+    /* 页面头部 */
+    .page-header {
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid var(--color-border-primary);
+    }
+
+    .page-title {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--spacing-xs) 0;
+      line-height: 1.25;
+    }
+
+    .page-description {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* 统计卡片网格 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stat-card {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-small);
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-2px);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+    }
+
+    .stat-icon.primary { background: var(--color-accent-primary); }
+    .stat-icon.success { background: var(--color-accent-secondary); }
+    .stat-icon.warning { background: var(--color-accent-warning); }
+    .stat-icon.danger { background: var(--color-accent-danger); }
+
+    .stat-value {
+      font-size: var(--font-size-2xl);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .stat-change {
+      font-size: var(--font-size-small);
+      color: var(--color-accent-secondary);
+      font-weight: 500;
+    }
+
+    /* 表单区域 */
+    .form-section {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .section-title {
+      font-size: var(--font-size-large);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--spacing-sm) 0;
+      padding-bottom: var(--spacing-xs);
+      border-bottom: 1px solid var(--color-bg-tertiary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    /* 引荐码区域 */
+    .referral-section {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .referral-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .referral-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .referral-label {
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    .referral-input-group {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    .referral-input {
+      flex: 1;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+      font-size: var(--font-size-base);
+      transition: border-color 0.2s ease;
+    }
+
+    .referral-input:focus {
+      outline: none;
+      border-color: var(--color-accent-primary);
+      box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+    }
+
+    /* GitHub风格按钮 */
+    .btn {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid transparent;
+      border-radius: var(--border-radius);
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      text-decoration: none;
+      white-space: nowrap;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-primary);
+    }
+
+    .btn:hover {
+      background: var(--color-bg-secondary);
+      border-color: var(--color-border-secondary);
+    }
+
+    .btn-primary {
+      background: var(--color-accent-primary);
+      color: white;
+      border-color: var(--color-accent-primary);
+    }
+
+    .btn-primary:hover {
+      background: #0858b9;
+      border-color: #0858b9;
+    }
+
+    .btn-secondary {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-bg-secondary);
+      border-color: var(--color-border-secondary);
+    }
+
+    /* GitHub风格表格 */
+    .table-section {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      margin-bottom: var(--spacing-xl);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--color-border-primary);
+      background: var(--color-bg-tertiary);
+    }
+
+    .table-title {
+      font-size: var(--font-size-large);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      padding: var(--spacing-md) var(--spacing-lg);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border-primary);
+    }
+
+    .table th {
+      background: var(--color-bg-tertiary);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
+    }
+
+    .table td {
+      color: var(--color-text-primary);
+    }
+
+    .table tbody tr:hover {
+      background: var(--color-bg-tertiary);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: var(--font-size-base);
+    }
+
+    .status-badge {
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: 12px;
+      font-size: var(--font-size-small);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: rgba(31, 136, 61, 0.1);
+      color: var(--color-accent-secondary);
+    }
+
+    .status-pending {
+      background: rgba(154, 103, 0, 0.1);
+      color: var(--color-accent-warning);
+    }
+
+    /* 奖励记录 */
+    .rewards-section {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .reward-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--color-border-primary);
+    }
+
+    .reward-item:last-child {
+      border-bottom: none;
+    }
+
+    .reward-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .reward-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-accent-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .reward-details h4 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .reward-details p {
+      font-size: var(--font-size-small);
+      color: var(--color-text-secondary);
+    }
+
+    .reward-amount {
+      font-size: var(--font-size-large);
+      font-weight: 600;
+      color: var(--color-accent-secondary);
+    }
+
+    /* 分享功能 */
+    .share-section {
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+    }
+
+    .share-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-lg);
+    }
+
+    .share-option {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .share-option:hover {
+      background: var(--color-bg-tertiary);
+      border-color: var(--color-accent-primary);
+    }
+
+    .share-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+    }
+
+    .share-icon.wechat { background: #07c160; }
+    .share-icon.qq { background: #12b7f5; }
+    .share-icon.weibo { background: #e6162d; }
+    .share-icon.link { background: var(--color-accent-primary); }
+
+    .share-text {
+      flex: 1;
+    }
+
+    .share-text h4 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .share-text p {
+      font-size: var(--font-size-small);
+      color: var(--color-text-secondary);
+    }
+
+    /* 模态框 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--color-bg-primary);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-lg);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--color-border-primary);
+    }
+
+    .modal-title {
+      font-size: var(--font-size-large);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .qr-code {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto var(--spacing-lg);
+      background: var(--color-bg-tertiary);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-small);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border-primary);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .referral-page-github {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .sidebar-nav {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border-primary);
+      }
+
+      .nav-menu .nav-list {
+        display: flex;
+        overflow-x: auto;
+        padding: var(--spacing-xs) var(--spacing-md);
+      }
+
+      .nav-item {
+        flex-shrink: 0;
+        margin: 0 var(--spacing-xs);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        white-space: nowrap;
+      }
+
+      .content-page {
+        padding: var(--spacing-md) var(--spacing-sm);
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .referral-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .share-options {
+        grid-template-columns: 1fr;
+      }
+
+      .table-container {
+        font-size: var(--font-size-small);
+      }
+
+      .table th,
+      .table td {
+        padding: var(--spacing-sm);
+      }
+
+      .page-title {
+        font-size: var(--font-size-large);
+      }
+    }
+
+    /* 动画效果 */
+    .content-page {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .nav-item,
+    .stat-card,
+    .share-option {
+      transition: all 0.2s ease;
+    }
+
+    /* Toast提示 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--border-radius);
+      color: white;
+      font-weight: 500;
+      z-index: 10000;
+      animation: slideIn 0.3s ease-out;
+      max-width: 300px;
+      box-shadow: var(--shadow-medium);
+    }
+
+    .toast.success {
+      background: var(--color-accent-secondary);
+    }
+
+    .toast.error {
+      background: var(--color-accent-danger);
+    }
+
+    .toast.info {
+      background: var(--color-accent-primary);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="referral-page-github">
+    <!-- 左侧导航栏 -->
+    <div class="sidebar-nav">
+      <div class="nav-header">
+        <h2 class="nav-title">设置</h2>
+      </div>
+      
+      <nav class="nav-menu">
+        <ul class="nav-list">
+          <li class="nav-item active">
+            <i class="fas fa-users nav-icon"></i>
+            <span class="nav-text">我的引荐</span>
+          </li>
+          <li class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">个人资料</span>
+          </li>
+          <li class="nav-item">
+            <i class="fas fa-cog nav-icon"></i>
+            <span class="nav-text">账户设置</span>
+          </li>
+          <li class="nav-item">
+            <i class="fas fa-shield-alt nav-icon"></i>
+            <span class="nav-text">安全设置</span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- 右侧内容区域 -->
+    <div class="content-area">
+      <div class="content-page">
+        <!-- 页面头部 -->
+        <div class="page-header">
+          <h1 class="page-title">我的引荐</h1>
+          <p class="page-description">管理您的引荐链接，查看引荐统计和奖励记录</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon primary">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <div class="stat-value">1,247</div>
+            <div class="stat-label">总引荐数</div>
+            <div class="stat-change">+12 本月</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon success">
+                <i class="fas fa-user-check"></i>
+              </div>
+            </div>
+            <div class="stat-value">892</div>
+            <div class="stat-label">成功注册</div>
+            <div class="stat-change">+8 本月</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon warning">
+                <i class="fas fa-coins"></i>
+              </div>
+            </div>
+            <div class="stat-value">15,680</div>
+            <div class="stat-label">累计积分</div>
+            <div class="stat-change">+1,240 本月</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon danger">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+            <div class="stat-value">71.6%</div>
+            <div class="stat-label">转化率</div>
+            <div class="stat-change">+2.1% 本月</div>
+          </div>
+        </div>
+
+        <!-- 引荐码区域 -->
+    <div class="referral-section">
+          <h2 class="section-title">
+            <i class="fas fa-link"></i>
+            引荐链接
+          </h2>
+          <div class="referral-grid">
+            <div class="referral-item">
+              <label class="referral-label">您的专属引荐码</label>
+              <div class="referral-input-group">
+                <input type="text" class="referral-input" value="MEDICAL2024" readonly>
+                <button class="btn btn-primary" onclick="copyToClipboard('MEDICAL2024')">
+                  <i class="fas fa-copy"></i>
+                  复制
+                </button>
+              </div>
+            </div>
+            <div class="referral-item">
+              <label class="referral-label">引荐链接</label>
+              <div class="referral-input-group">
+                <input type="text" class="referral-input" value="https://medical-platform.com/register?ref=MEDICAL2024" readonly>
+                <button class="btn btn-primary" onclick="copyToClipboard('https://medical-platform.com/register?ref=MEDICAL2024')">
+                  <i class="fas fa-copy"></i>
+                  复制
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 引荐用户表格 -->
+        <div class="table-section">
+          <div class="table-header">
+            <h2 class="table-title">
+              <i class="fas fa-user-friends"></i>
+              引荐用户列表
+            </h2>
+    </div>
+          <div class="table-container">
+            <table class="table">
+      <thead>
+        <tr>
+                  <th>用户</th>
+                  <th>注册时间</th>
+                  <th>状态</th>
+                  <th>积分奖励</th>
+                  <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div class="user-avatar">张</div>
+                      <div>
+                        <div style="font-weight: 600;">张医生</div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary);">zhang.doctor@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>2024-01-15 14:30</td>
+                  <td><span class="status-badge status-active">已激活</span></td>
+                  <td>+500 积分</td>
+                  <td>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-eye"></i>
+                      查看
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div class="user-avatar">李</div>
+                      <div>
+                        <div style="font-weight: 600;">李护士</div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary);">li.nurse@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>2024-01-20 09:15</td>
+                  <td><span class="status-badge status-active">已激活</span></td>
+                  <td>+500 积分</td>
+                  <td>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-eye"></i>
+                      查看
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div class="user-avatar">王</div>
+                      <div>
+                        <div style="font-weight: 600;">王主任</div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary);">wang.director@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>2024-02-05 16:45</td>
+                  <td><span class="status-badge status-pending">待激活</span></td>
+                  <td>+0 积分</td>
+                  <td>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-eye"></i>
+                      查看
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <div class="user-avatar">陈</div>
+                      <div>
+                        <div style="font-weight: 600;">陈教授</div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary);">chen.professor@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>2024-02-12 11:20</td>
+                  <td><span class="status-badge status-active">已激活</span></td>
+                  <td>+500 积分</td>
+                  <td>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-eye"></i>
+                      查看
+                    </button>
+                  </td>
+                </tr>
+      </tbody>
+    </table>
+          </div>
+        </div>
+
+        <!-- 奖励记录 -->
+        <div class="rewards-section">
+          <h2 class="section-title">
+            <i class="fas fa-trophy"></i>
+            奖励记录
+          </h2>
+          <div class="reward-item">
+            <div class="reward-info">
+              <div class="reward-icon">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="reward-details">
+                <h4>新用户注册奖励</h4>
+                <p>张医生通过您的引荐完成注册</p>
+              </div>
+            </div>
+            <div class="reward-amount">+500 积分</div>
+          </div>
+          <div class="reward-item">
+            <div class="reward-info">
+              <div class="reward-icon">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="reward-details">
+                <h4>新用户注册奖励</h4>
+                <p>李护士通过您的引荐完成注册</p>
+              </div>
+            </div>
+            <div class="reward-amount">+500 积分</div>
+          </div>
+          <div class="reward-item">
+            <div class="reward-info">
+              <div class="reward-icon">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="reward-details">
+                <h4>新用户注册奖励</h4>
+                <p>陈教授通过您的引荐完成注册</p>
+              </div>
+            </div>
+            <div class="reward-amount">+500 积分</div>
+          </div>
+        </div>
+
+        <!-- 分享功能 -->
+        <div class="share-section">
+          <h2 class="section-title">
+            <i class="fas fa-share-alt"></i>
+            分享引荐链接
+          </h2>
+          <div class="share-options">
+            <div class="share-option" onclick="showQRCode()">
+              <div class="share-icon wechat">
+                <i class="fab fa-weixin"></i>
+              </div>
+              <div class="share-text">
+                <h4>微信分享</h4>
+                <p>生成二维码分享到微信</p>
+              </div>
+            </div>
+            <div class="share-option" onclick="shareToQQ()">
+              <div class="share-icon qq">
+                <i class="fab fa-qq"></i>
+              </div>
+              <div class="share-text">
+                <h4>QQ分享</h4>
+                <p>分享到QQ好友或群聊</p>
+              </div>
+            </div>
+            <div class="share-option" onclick="shareToWeibo()">
+              <div class="share-icon weibo">
+                <i class="fab fa-weibo"></i>
+              </div>
+              <div class="share-text">
+                <h4>微博分享</h4>
+                <p>分享到新浪微博</p>
+              </div>
+            </div>
+            <div class="share-option" onclick="copyLink()">
+              <div class="share-icon link">
+                <i class="fas fa-link"></i>
+              </div>
+              <div class="share-text">
+                <h4>复制链接</h4>
+                <p>复制链接到剪贴板</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 二维码模态框 -->
+  <div class="modal" id="qrModal">
+    <div class="modal-content">
+      <h3 class="modal-title">微信分享二维码</h3>
+      <div class="qr-code">
+        <div style="text-align: center;">
+          <i class="fas fa-qrcode" style="font-size: 48px; color: var(--color-text-tertiary); margin-bottom: 8px;"></i>
+          <div>二维码生成中...</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="closeModal()">
+        <i class="fas fa-times"></i>
+        关闭
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // 复制到剪贴板功能
+    function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        // 使用现代 Clipboard API
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('已复制到剪贴板！', 'success');
+        }).catch(() => {
+          fallbackCopyTextToClipboard(text);
+        });
+      } else {
+        // 降级到传统方法
+        fallbackCopyTextToClipboard(text);
+      }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        showToast('已复制到剪贴板！', 'success');
+      } catch (err) {
+        showToast('复制失败，请手动复制', 'error');
+      }
+      
+      document.body.removeChild(textArea);
+    }
+
+    // 显示提示消息
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 300);
+      }, 3000);
+    }
+
+    // 二维码模态框
+    function showQRCode() {
+      document.getElementById('qrModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('qrModal').classList.remove('show');
+    }
+
+    // 分享功能
+    function shareToQQ() {
+      const url = encodeURIComponent('https://medical-platform.com/register?ref=MEDICAL2024');
+      const title = encodeURIComponent('医疗影像模型管理平台 - 邀请您加入');
+      const desc = encodeURIComponent('专业的医疗影像AI处理平台，提升诊断效率');
+      window.open(`https://connect.qq.com/widget/shareqq/index.html?url=${url}&title=${title}&desc=${desc}`);
+    }
+
+    function shareToWeibo() {
+      const url = encodeURIComponent('https://medical-platform.com/register?ref=MEDICAL2024');
+      const title = encodeURIComponent('医疗影像模型管理平台 - 邀请您加入');
+      window.open(`https://service.weibo.com/share/share.php?url=${url}&title=${title}`);
+    }
+
+    function copyLink() {
+      copyToClipboard('https://medical-platform.com/register?ref=MEDICAL2024');
+    }
+
+    // 点击模态框外部关闭
+    document.getElementById('qrModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // 键盘事件
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('GitHub风格引荐页面加载完成');
+    });
+  </script>
+</body>
+</html>
