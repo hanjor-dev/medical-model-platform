@@ -1,0 +1,56 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# Docker volumes（数据文件不要提交）
+docker/mysql/data/
+docker/redis/data/
+docker/rabbitmq/data/
+
+# 日志文件
+logs/
+*.log
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编译文件
+*.class
+*.jar
+*.war
+*.ear
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
+*~
+
+# 测试覆盖率
+*.coverage
+htmlcov/
+
+# 其他
+.env
+.env.local

@@ -1,0 +1,273 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 医疗影像模型管理平台 - 异常处理和API返回体系规范
+
+## 🎯 核心规范
+
+### API响应格式
+- **所有Controller接口必须返回ApiResult<T>类型**
+- **禁止直接返回实体类或基础类型**
+- **统一使用success()和error()方法构建响应**
+
+### 异常处理机制
+- **Service层遇到业务错误必须抛出ServiceException**
+- **Controller层不要捕获ServiceException，让其传播到GlobalExceptionHandler**
+
+### 错误码管理
+- **必须使用ErrorCode枚举中定义的错误码**
+- **如果ErrorCode中没有合适的错误码，允许添加新的错误码**
+- **新增错误码必须按模块范围分类（见下方错误码范围）**
+
+## 📚 API使用规范
+
+### ApiResult使用方法
+```java
+// ✅ 正确的成功响应
+return ApiResult.success();                    // 成功，无数据
+return ApiResult.success(data);                // 成功，返回数据  
+return ApiResult.success("操作完成");           // 成功，自定义消息
+return ApiResult.success("保存成功", data);     // 成功，自定义消息和数据
+
+// ✅ 正确的失败响应
+return ApiResult.error(ErrorCode.NOT_FOUND);           // 使用错误码
+return ApiResult.error(ErrorCode.NOT_FOUND, "用户不存在");  // 错误码+自定义消息
+return ApiResult.error("操作失败");                      // 自定义消息
+return ApiResult.error(1001, "自定义错误");              // 自定义错误码和消息
+
+// ❌ 错误的做法
+return user;                                   // 禁止直接返回实体
+return "success";                              // 禁止返回字符串
+return ResponseEntity.ok(data);                // 禁止使用ResponseEntity
+```
+
+### ServiceException使用方法
+```java
+
+// ✅ 基本使用方法
+throw new ServiceException("用户不存在");                           // 自定义消息
+throw new ServiceException(ErrorCode.DATA_NOT_FOUND);              // 使用错误码
+throw new ServiceException(ErrorCode.OPERATION_NOT_ALLOWED, "账户已锁定"); // 错误码+自定义消息
+
+// ❌ 错误的做法
+throw new RuntimeException("错误");            // 禁止使用RuntimeException
+throw new IllegalArgumentException("参数错误"); // 禁止使用标准异常
+return null;                                   // 禁止返回null表示错误
+```
+
+## 🔧 ErrorCode错误码范围
+
+### 当前已定义的错误码范围：
+- **200**: 成功状态
+- **400-499**: 客户端错误
+- **500-599**: 服务端错误  
+- **1000-1099**: 参数验证错误
+- **1100-1199**: 文件操作错误
+- **1200-1299**: 数据库操作错误
+- **1300-1399**: 业务逻辑错误
+- **1400-1499**: 任务相关错误
+- **1500-1599**: 模型相关错误
+- **1600-1699**: 外部服务错误
+
+### 预留的模块错误码范围（可扩展）：
+- **1700-1799**: 用户认证相关错误
+- **1800-1899**: 权限管理相关错误
+- **1900-1999**: 积分系统相关错误
+- **2000-2099**: 医疗影像相关错误
+- **2100-2199**: AI模型训练相关错误
+- **2200-2299**: 报告生成相关错误
+- **2300-2399**: 审计日志相关错误
+- **2400-2499**: 系统配置相关错误
+
+### 添加新错误码的规范：
+```java
+// ✅ 正确的新增方式 - 在ErrorCode.java中按范围添加
+// 用户认证相关错误 1700-1799
+USER_NOT_FOUND(1701, "用户不存在"),
+USER_PASSWORD_WRONG(1702, "密码错误"),
+USER_ACCOUNT_LOCKED(1703, "账户已锁定"),
+USER_TOKEN_EXPIRED(1704, "登录令牌已过期"),
+
+// 权限管理相关错误 1800-1899  
+PERMISSION_DENIED(1801, "权限不足"),
+ROLE_NOT_FOUND(1802, "角色不存在"),
+ROLE_ALREADY_EXISTS(1803, "角色已存在"),
+
+// 积分系统相关错误 1900-1999
+CREDIT_INSUFFICIENT(1901, "积分余额不足"),
+CREDIT_TYPE_INVALID(1902, "积分类型无效"),
+CREDIT_TRANSFER_FAILED(1903, "积分转账失败"),
+```
+
+## 📝 代码编写规范
+
+### Controller层规范
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    
+    // ✅ 标准的Controller方法
+    @GetMapping("/{id}")
+    public ApiResult<User> getUser(@PathVariable Long id) {
+        User user = userService.getById(id);
+        return ApiResult.success(user);
+    }
+    
+    @PostMapping
+    public ApiResult<User> createUser(@RequestBody @Valid UserRequest request) {
+        User user = userService.create(request);
+        return ApiResult.success("用户创建成功", user);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ApiResult<Void> deleteUser(@PathVariable Long id) {
+        userService.delete(id);
+        return ApiResult.success("用户删除成功");
+    }
+    
+    // ❌ 错误的Controller方法
+    @GetMapping("/wrong/{id}")
+    public User getWrongUser(@PathVariable Long id) {  // 禁止直接返回实体
+        return userService.getById(id);
+    }
+}
+```
+
+### Service层规范
+```java
+@Service
+public class UserService {
+    
+    // ✅ 标准的Service方法
+    public User getById(Long id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            // 主动抛出业务异常
+            throw ServiceException.dataNotFound("用户不存在: " + id);
+        }
+        return user;
+    }
+    
+    public User create(UserRequest request) {
+        // 业务规则验证
+        if (userMapper.existsByEmail(request.getEmail())) {
+            throw ServiceException.dataAlreadyExists("邮箱已被使用");
+        }
+        
+        if (request.getAge() < 18) {
+            throw ServiceException.paramInvalid("年龄必须大于等于18岁");
+        }
+        
+        // 正常业务逻辑
+        User user = new User();
+        // ... 设置用户信息
+        userMapper.insert(user);
+        return user;
+    }
+    
+    // ❌ 错误的Service方法
+    public User getBadExample(Long id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            return null;  // 禁止返回null表示错误
+        }
+        return user;
+    }
+}
+```
+
+### 参数验证规范
+```java
+// ✅ 使用@Valid注解进行参数验证
+@PostMapping
+public ApiResult<User> createUser(@RequestBody @Valid UserRequest request) {
+    // @Valid会自动触发参数验证，失败时GlobalExceptionHandler会统一处理
+    User user = userService.create(request);
+    return ApiResult.success(user);
+}
+
+// ✅ 手动参数验证时抛出ServiceException
+public void validateUser(UserRequest request) {
+    if (StringUtils.isEmpty(request.getEmail())) {
+        throw ServiceException.paramInvalid("邮箱不能为空");
+    }
+    if (request.getAge() < 0 || request.getAge() > 150) {
+        throw ServiceException.paramInvalid("年龄必须在0-150之间");
+    }
+}
+```
+
+## 🎯 最佳实践原则
+
+### 1. Controller层原则
+- **只返回ApiResult**: 所有接口都使用ApiResult包装
+- **简化逻辑**: 业务逻辑交给Service层，Controller只负责参数验证和结果返回
+- **异常透传**: 让ServiceException向上传播，由GlobalExceptionHandler处理
+- **统一格式**: 所有响应格式保持一致
+
+### 2. Service层原则  
+- **主动抛异常**: 遇到业务错误时主动抛出ServiceException
+- **使用静态方法**: 优先使用ServiceException的静态工厂方法
+- **错误码选择**: 选择合适的ErrorCode，必要时自定义消息
+- **业务聚焦**: 专注业务逻辑，不处理HTTP响应格式
+
+### 3. 错误码使用原则
+- **按模块分类**: 使用对应模块范围内的错误码
+- **语义明确**: 选择语义最接近的错误码
+- **自定义消息**: 当默认消息不够具体时，提供自定义消息
+- **范围预留**: 为新模块预留足够的错误码空间
+
+### 4. 异常处理原则
+- **不要捕获ServiceException**: 让它传播到GlobalExceptionHandler
+- **记录关键信息**: 在Service层记录关键操作日志
+- **用户友好**: 异常消息要对用户友好，避免技术细节
+- **统一处理**: 所有异常都由GlobalExceptionHandler统一处理
+
+## 🚫 禁止行为
+
+### 绝对禁止的做法：
+1. **Controller直接返回实体类或基础类型**
+2. **使用RuntimeException或标准Java异常代替ServiceException**
+3. **在Controller层捕获ServiceException**
+4. **返回null表示业务错误**
+5. **使用ResponseEntity代替ApiResult**
+6. **硬编码错误码，不使用ErrorCode枚举**
+7. **跨模块使用错误码（如在用户模块使用文件模块的错误码）**
+
+### 编码时必须检查：
+- ✅ 是否使用了ApiResult包装返回结果？
+- ✅ 是否在适当的地方抛出了ServiceException？
+- ✅ 是否使用了合适的ErrorCode？
+- ✅ 异常消息是否用户友好？
+- ✅ 是否遵循了模块错误码范围？
+
+## 📋 响应格式示例
+
+### 成功响应格式
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "id": 1,
+    "name": "张三",
+    "email": "zhangsan@example.com"
+  },
+  "timestamp": 1673836800000
+}
+```
+
+### 失败响应格式
+```json
+{
+  "code": 1701,
+  "message": "用户不存在",
+  "data": null,
+  "timestamp": 1673836800000
+}
+```
+
+这套异常处理和API返回体系确保了代码的一致性、可维护性和用户体验的统一性。遵循这些规范将让开发更加高效和规范。 

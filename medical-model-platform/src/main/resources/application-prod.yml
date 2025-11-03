@@ -1,0 +1,158 @@
+# 生产环境配置
+spring:
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://prod-mysql:3306/medical_model_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=true&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: app_user
+    password: prod_password_change_me
+    druid:
+      initial-size: 20
+      min-idle: 20
+      max-active: 100
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall,slf4j
+      web-stat-filter:
+        enabled: false
+      stat-view-servlet:
+        enabled: false
+
+  # Redis配置 - Spring Boot 3.x新格式
+  data:
+    redis:
+      host: prod-redis
+      port: 6379
+      password: prod_redis_password_change_me
+      database: 0
+      timeout: 10s
+      ssl:
+        enabled: false
+      lettuce:
+        pool:
+          max-active: 500
+          max-wait: -1ms
+          max-idle: 50
+          min-idle: 10
+
+  # RabbitMQ配置
+  rabbitmq:
+    host: prod-rabbitmq
+    port: 5672
+    username: admin
+    password: prod_rabbitmq_password_change_me
+    virtual-host: /medical-model-platform
+    ssl:
+      enabled: false
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+      retry:
+        enabled: true
+        initial-interval: 1000ms
+        max-attempts: 3
+        max-interval: 10000ms
+        multiplier: 1.0
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        max-concurrency: 10
+        prefetch: 1
+        auto-startup: true
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-attempts: 3
+          max-interval: 10000ms
+          multiplier: 1.0
+
+# 邮件配置
+  mail:
+    host: prod-smtp
+    port: 587
+    username: no-reply@your-domain.com
+    password: change_me
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Sa-Token配置
+sa-token:
+  alone-redis:
+    host: prod-redis
+    port: 6379
+    password: prod_redis_password_change_me
+    database: 1
+    ssl: false
+
+# 阿里云OSS配置
+dromara:
+  x-file-storage:
+    default-platform: aliyun-oss-1
+    aliyun-oss:
+      - platform: aliyun-oss-1
+        access-key: your-prod-access-key
+        secret-key: your-prod-secret-key
+        end-point: https://oss-cn-beijing.aliyuncs.com
+        bucket-name: medical-platform
+        domain: https://your-domain.com
+        base-path: prod/
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 开启缓存
+    cache-enabled: true
+    # 开启延迟加载
+    lazy-loading-enabled: true
+    # 开启积极延迟加载
+    aggressive-lazy-loading: false
+    # 乐观锁配置
+    optimistic-locker: true
+  global-config:
+    db-config:
+      # 逻辑删除配置
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      # 乐观锁配置
+      version-field: version
+      # 主键策略
+      id-type: ASSIGN_ID
+
+# 日志配置
+logging:
+  level:
+    com.okbug.platform: INFO
+    com.okbug.platform.mapper: OFF
+    org.apache.ibatis: OFF
+    root: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: /app/logs/medical-platform.log
+    max-size: 500MB
+    max-history: 30
+    total-size-cap: 10GB
+
+# Swagger配置（生产环境禁用）
+swagger:
+  enable: false 
+

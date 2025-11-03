@@ -1,0 +1,495 @@
+---
+alwaysApply: true
+---
+# 医学影像模型管理系统 - 开发规范规则
+
+## 代码规范标准
+
+### 基础规范
+- **遵循**: 《阿里巴巴Java开发规范》
+- **原则**: 《代码整洁之道》
+- **可读性**: 代码即文档，优先考虑可读性
+- **一致性**: 项目内保持编码风格统一
+
+### 命名规范
+- **类名**: PascalCase (UserService, TaskController)
+- **方法名**: camelCase (getUserInfo, createTask)
+- **变量名**: camelCase (userName, taskId)
+- **常量名**: UPPER_SNAKE_CASE (MAX_RETRY_COUNT)
+- **包名**: 小写+点分隔 (com.okbug.platform.service)
+
+- **禁止注解SQL**: 不允许在Mapper接口方法上使用@Select、@Insert等SQL注解
+- **纯Java API**: 使用QueryWrapper、UpdateWrapper等进行复杂查询
+- **统一风格**: 保持代码风格一致，提高可维护性
+
+### 模块化目录结构规范
+- **按功能模块组织**: 每个功能模块的代码必须放在对应的文件夹下
+- **目录结构示例**: 
+  - `entity/auth/` - 用户认证相关实体
+  - `entity/credit/` - 积分相关实体
+  - `mapper/auth/` - 用户认证相关Mapper
+  - `controller/credit/` - 积分相关Controller
+- **模块划分**: auth(认证)、user(用户)、credit(积分)、permission(权限)、system(系统)
+- **避免混乱**: 不允许将所有文件直接放在顶级模块目录下
+
+### 接口参数规范
+- **接口参数对象化**：如果controller中接口参数大于2个，必须创建DTO参数对象进行封装；
+
+### 注释规范
+```java
+/**
+ * 用户服务类：用户相关业务逻辑处理
+ * 包含用户注册、登录、信息管理等核心功能
+ * 
+ * @author hanjor
+ * @version 1.0
+ * @date 2025-01-14 15:30:00
+ */
+public class UserService {
+    
+    /**
+     * 用户登录验证
+     * 验证用户凭据并生成访问令牌
+     * 
+     * @param username 用户名，不能为空
+     * @param password 密码，不能为空
+     * @return 登录结果，包含用户信息和令牌
+     * @throws BusinessException 登录失败时抛出
+     */
+    public LoginResult login(String username, String password) {
+        // 参数验证
+        if (!StringUtils.hasText(username)) {
+            throw BusinessException.userNotFound();
+        }
+        
+        // 密码验证
+        User user = userMapper.findByUsername(username);
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            logger.warn("用户登录失败: {}", username);
+            throw BusinessException.userPasswordError();
+        }
+        
+        // 生成令牌
+        String token = saTokenUtils.createToken(user.getId());
+        logger.info("用户登录成功: {}", username);
+        
+        return LoginResult.success(user, token);
+    }
+}
+```
+
+## 异常处理规范
+
+### 异常分类体系
+参考已实现的异常处理架构：
+- [BaseException](mdc:medical-model-platform/medical-model-platform/medical-model-platform/src/main/java/com/okbug/platform/common/base/BaseException.java) - 基础异常类
+- [BusinessException](mdc:medical-model-platform/medical-model-platform/medical-model-platform/src/main/java/com/okbug/platform/common/base/BusinessException.java) - 业务异常类
+- [ResultCode](mdc:medical-model-platform/medical-model-platform/medical-model-platform/src/main/java/com/okbug/platform/common/base/ResultCode.java) - 错误码枚举
+
+### 异常抛出规范
+```java
+// ✅ 正确的异常抛出
+if (user == null) {
+    throw BusinessException.userNotFound();
+}
+
+if (points < requiredPoints) {
+    throw BusinessException.pointNotEnough();
+}
+
+// ❌ 错误的异常抛出
+throw new RuntimeException("用户不存在"); // 不要直接抛出RuntimeException
+throw new Exception("文件上传失败");      // 不要抛出受检异常
+```
+
+### 异常处理规范
+```java
+// ✅ 正确的异常处理
+try {
+    algorithmResult = algorithmExecutor.execute(params);
+    logger.info("算法执行成功: taskId={}, duration={}ms", taskId, duration);
+} catch (BusinessException e) {
+    // 业务异常直接抛出，由全局异常处理器处理
+    throw e;
+} catch (Exception e) {
+    // 未知异常包装为业务异常
+    logger.error("算法执行失败: taskId={}", taskId, e);
+    throw new BaseException(ResultCode.ALGORITHM_EXECUTE_FAILED, e.getMessage());
+}
+```
+
+## 日志记录规范
+
+### 日志级别使用
+- **ERROR**: 系统错误、业务异常、外部服务调用失败
+- **WARN**: 业务警告、性能问题、配置问题
+- **INFO**: 业务操作、状态变更、关键流程
+- **DEBUG**: 详细执行过程、参数信息、调试信息
+
+### 日志记录最佳实践
+```java
+public class TaskService {
+    private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
+    
+    public void createTask(TaskRequest request) {
+        String taskId = IdUtil.fastSimpleUUID();
+        
+        // 记录业务操作
+        logger.info("创建任务开始: taskId={}, userId={}, algorithmType={}", 
+                   taskId, request.getUserId(), request.getAlgorithmType());
+        
+        try {
+            // 业务逻辑
+            Task task = buildTask(request);
+            taskMapper.insert(task);
+            
+            // 异步提交到计算引擎
+            rabbitTemplate.convertAndSend("task.submit", task);
+            
+            logger.info("任务创建成功: taskId={}", taskId);
+            
+        } catch (Exception e) {
+            logger.error("任务创建失败: taskId={}, error={}", taskId, e.getMessage(), e);
+            throw new BusinessException(ResultCode.TASK_CREATE_FAILED, e.getMessage());
+        }
+    }
+}
+```
+
+### 敏感信息处理
+```java
+// ✅ 正确的日志记录
+logger.info("用户登录: username={}", username);
+logger.debug("API调用: url={}, params={}", url, maskSensitiveData(params));
+
+// ❌ 错误的日志记录
+logger.info("用户登录: password={}", password);  // 不要记录密码
+logger.info("支付信息: {}", paymentInfo);        // 不要记录支付信息
+```
+
+## 数据库操作规范
+
+### MyBatis-Plus使用规范
+```java
+@Service
+public class UserServiceImpl implements UserService {
+    
+    @Autowired
+    private UserMapper userMapper;
+    
+    /**
+     * 分页查询用户列表
+     */
+    public Page<User> getUserList(UserQueryRequest request) {
+        // 构建查询条件
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(StringUtils.hasText(request.getUsername()), 
+                          User::getUsername, request.getUsername())
+                   .eq(request.getStatus() != null, 
+                       User::getStatus, request.getStatus())
+                   .orderByDesc(User::getCreateTime);
+        
+        // 分页查询
+        Page<User> page = new Page<>(request.getPageNum(), request.getPageSize());
+        return userMapper.selectPage(page, queryWrapper);
+    }
+    
+    /**
+     * 逻辑删除用户
+     */
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw BusinessException.userNotFound();
+        }
+        
+        // MyBatis-Plus自动处理逻辑删除
+        userMapper.deleteById(userId);
+        
+        logger.info("用户删除成功: userId={}", userId);
+    }
+}
+```
+
+### 事务管理规范
+```java
+// ✅ 正确的事务使用
+@Transactional(rollbackFor = Exception.class)
+public void transferPoints(Long fromUserId, Long toUserId, Integer points) {
+    // 扣减转出用户积分
+    pointService.deductPoints(fromUserId, points);
+    
+    // 增加转入用户积分
+    pointService.addPoints(toUserId, points);
+    
+    // 记录转账记录
+    pointTransferService.recordTransfer(fromUserId, toUserId, points);
+}
+
+// ❌ 错误的事务使用
+@Transactional // 默认只回滚RuntimeException，可能导致数据不一致
+public void updateUserInfo(User user) throws Exception {
+    // ...
+}
+```
+
+## API设计规范
+
+### RESTful API设计
+```java
+@RestController
+@RequestMapping("/api/v1/users")
+@Api(tags = "用户管理")
+public class UserController {
+    
+    /**
+     * 获取用户列表
+     */
+    @GetMapping
+    @ApiOperation("获取用户列表")
+    public BaseResult<Page<UserVO>> getUserList(
+            @ApiParam("查询条件") @Valid UserQueryRequest request) {
+        Page<User> userPage = userService.getUserList(request);
+        Page<UserVO> voPage = userConverter.toVOPage(userPage);
+        return BaseResult.success(voPage);
+    }
+    
+    /**
+     * 获取用户详情
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("获取用户详情")
+    public BaseResult<UserDetailVO> getUserDetail(
+            @ApiParam("用户ID") @PathVariable Long id) {
+        User user = userService.getUserById(id);
+        UserDetailVO vo = userConverter.toDetailVO(user);
+        return BaseResult.success(vo);
+    }
+    
+    /**
+     * 创建用户
+     */
+    @PostMapping
+    @ApiOperation("创建用户")
+    public BaseResult<UserVO> createUser(
+            @ApiParam("用户信息") @Valid @RequestBody CreateUserRequest request) {
+        User user = userService.createUser(request);
+        UserVO vo = userConverter.toVO(user);
+        return BaseResult.success(vo);
+    }
+    
+    /**
+     * 更新用户
+     */
+    @PutMapping("/{id}")
+    @ApiOperation("更新用户")
+    public BaseResult<Void> updateUser(
+            @ApiParam("用户ID") @PathVariable Long id,
+            @ApiParam("更新信息") @Valid @RequestBody UpdateUserRequest request) {
+        userService.updateUser(id, request);
+        return BaseResult.success();
+    }
+    
+    /**
+     * 删除用户
+     */
+    @DeleteMapping("/{id}")
+    @ApiOperation("删除用户")
+    public BaseResult<Void> deleteUser(
+            @ApiParam("用户ID") @PathVariable Long id) {
+        userService.deleteUser(id);
+        return BaseResult.success();
+    }
+}
+```
+
+### 统一返回格式
+```java
+// ✅ 正确的返回格式
+return BaseResult.success(data);                    // 成功返回数据
+return BaseResult.success();                        // 成功无数据
+return BaseResult.error(ResultCode.USER_NOT_FOUND); // 失败返回
+
+// ❌ 错误的返回格式
+return data;                                        // 不要直接返回数据
+return ResponseEntity.ok(data);                     // 不要使用ResponseEntity
+```
+
+## 性能优化规范
+
+### 缓存使用规范
+```java
+@Service
+public class UserService {
+    
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    
+    private static final String USER_CACHE_KEY = "user:info:";
+    private static final int CACHE_EXPIRE_SECONDS = 3600;
+    
+    /**
+     * 获取用户信息（带缓存）
+     */
+    public User getUserById(Long userId) {
+        String cacheKey = USER_CACHE_KEY + userId;
+        
+        // 先查缓存
+        User user = (User) redisTemplate.opsForValue().get(cacheKey);
+        if (user != null) {
+            return user;
+        }
+        
+        // 缓存未命中，查数据库
+        user = userMapper.selectById(userId);
+        if (user != null) {
+            // 设置缓存
+            redisTemplate.opsForValue().set(cacheKey, user, CACHE_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        }
+        
+        return user;
+    }
+    
+    /**
+     * 更新用户信息（清除缓存）
+     */
+    @Transactional
+    public void updateUser(User user) {
+        userMapper.updateById(user);
+        
+        // 清除缓存
+        String cacheKey = USER_CACHE_KEY + user.getId();
+        redisTemplate.delete(cacheKey);
+    }
+}
+```
+
+### 异步处理规范
+```java
+@Service
+public class TaskService {
+    
+    @Async
+    @EventListener
+    public void handleTaskCompletion(TaskCompletionEvent event) {
+        // 异步处理任务完成后的操作
+        try {
+            // 发送通知
+            notificationService.sendTaskCompletionNotification(event.getTaskId());
+            
+            // 更新统计信息
+            statisticsService.updateTaskStatistics(event.getTaskId());
+            
+        } catch (Exception e) {
+            logger.error("任务完成后处理失败: taskId={}", event.getTaskId(), e);
+        }
+    }
+}
+```
+
+## 测试规范
+
+### 单元测试规范
+```java
+@SpringBootTest
+@Transactional
+@Rollback
+class UserServiceTest {
+    
+    @Autowired
+    private UserService userService;
+    
+    @Test
+    @DisplayName("用户注册成功")
+    void testUserRegisterSuccess() {
+        // Given
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("testuser");
+        request.setPassword("password123");
+        request.setEmail("test@example.com");
+        
+        // When
+        User user = userService.register(request);
+        
+        // Then
+        assertThat(user).isNotNull();
+        assertThat(user.getUsername()).isEqualTo("testuser");
+        assertThat(user.getEmail()).isEqualTo("test@example.com");
+    }
+    
+    @Test
+    @DisplayName("用户名已存在注册失败")
+    void testUserRegisterFailWithDuplicateUsername() {
+        // Given
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("existinguser");
+        
+        // When & Then
+        assertThatThrownBy(() -> userService.register(request))
+            .isInstanceOf(BusinessException.class)
+            .extracting("code")
+            .isEqualTo(ResultCode.USER_ALREADY_EXISTS.getCode());
+    }
+}
+```
+
+## 安全规范
+
+### 输入验证
+```java
+@Data
+@ApiModel("创建用户请求")
+public class CreateUserRequest {
+    
+    @NotBlank(message = "用户名不能为空")
+    @Length(min = 4, max = 20, message = "用户名长度必须在4-20个字符之间")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "用户名只能包含字母、数字和下划线")
+    @ApiModelProperty("用户名")
+    private String username;
+    
+    @NotBlank(message = "密码不能为空")
+    @Length(min = 8, max = 50, message = "密码长度必须在8-50个字符之间")
+    @ApiModelProperty("密码")
+    private String password;
+    
+    @NotBlank(message = "邮箱不能为空")
+    @Email(message = "邮箱格式不正确")
+    @ApiModelProperty("邮箱")
+    private String email;
+}
+```
+
+### 权限控制
+```java
+@RestController
+public class UserController {
+    
+    /**
+     * 需要管理员权限
+     */
+    @GetMapping("/admin/users")
+    @SaCheckRole("admin")
+    public BaseResult<List<User>> getAllUsers() {
+        return BaseResult.success(userService.getAllUsers());
+    }
+    
+    /**
+     * 需要用户权限且只能访问自己的信息
+     */
+    @GetMapping("/users/{id}")
+    public BaseResult<User> getUserInfo(@PathVariable Long id) {
+        // 检查是否访问自己的信息或具有管理员权限
+        Long currentUserId = StpUtil.getLoginIdAsLong();
+        if (!currentUserId.equals(id) && !StpUtil.hasRole("admin")) {
+            throw BusinessException.userPermissionDenied();
+        }
+        
+        return BaseResult.success(userService.getUserById(id));
+    }
+}
+```
+
+
+##AI思考过程与回复规范
+###AI必要时尽量使用中文回复、展示内容或思考过程

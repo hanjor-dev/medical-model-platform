@@ -1,0 +1,98 @@
+version: '3.8'
+
+# 医学影像模型管理平台 - Docker开发环境配置
+# 包含: MySQL 8.0, Redis 7.2, RabbitMQ 3.13
+#
+# 使用方法:
+#   1. 确保 .env 文件存在（从 env.template 复制）
+#   2. Windows: .\start-docker.ps1
+#      Linux/Mac: docker-compose up -d
+
+services:
+  # MySQL 8.0
+  mysql:
+    image: mysql:8.0
+    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+      # 注释掉my.cnf挂载以避免Windows权限问题
+      # - ./mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - ${NETWORK_NAME}
+    command: 
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+      - --max-connections=${MYSQL_MAX_CONNECTIONS}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 7.2
+  redis:
+    image: redis:7.2-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ 3.13
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: /
+      TZ: ${TZ}
+    ports:
+      - "${RABBITMQ_PORT}:5672"           # AMQP端口
+      - "${RABBITMQ_MANAGEMENT_PORT}:15672"  # 管理界面端口
+    volumes:
+      - ./rabbitmq/data:/var/lib/rabbitmq
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  medical-network:
+    name: ${NETWORK_NAME}
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  rabbitmq_data:
+
+

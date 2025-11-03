@@ -1,0 +1,83 @@
+# 医学影像模型管理平台配置文件
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: medical-model-platform
+  
+  # 配置文件
+  profiles:
+    active: local
+
+  # 序列化配置
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: NON_NULL
+  
+  # 邮件配置（根据环境在 application-*.yml 覆盖）
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: no-reply@example.com
+    password: your_app_password
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Sa-Token配置
+sa-token:
+  token-name: Authorization
+  timeout: 2592000
+  active-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  is-log: false
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.okbug.platform.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID
+      logic-delete-field: is_deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# SpringDoc OpenAPI配置
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  packages-to-scan: com.okbug.platform.controller
+  paths-to-match: /**
+
+# 日志配置已迁移到logback-spring.xml
+# 保留基础配置用于某些特殊情况
+logging:
+  level:
+    root: INFO 
+

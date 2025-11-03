@@ -1,0 +1,95 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 医学影像模型管理系统 - 项目总体规则
+
+## 项目架构概述
+
+这是一个基于微服务架构的医学影像AI处理平台，包含两个独立的Spring Boot服务：
+
+- **业务管理平台** ([medical-model-platform](mdc:medical-model-platform/medical-model-platform/medical-model-platform)): 用户管理、任务编排、文件管理等业务逻辑
+- **AI计算引擎** ([ai-compute-engine](mdc:medical-model-platform/medical-model-platform/ai-compute-engine)): AI算法执行、任务调度、资源管理
+
+## 核心配置文件
+
+### 根目录配置
+- [README.md](mdc:medical-model-platform/medical-model-platform/README.md) - 项目总体说明文档
+
+### 业务管理平台
+- [项目入口](mdc:medical-model-platform/medical-model-platform/medical-model-platform) - 医学影像业务管理平台
+- [平台专属规则](mdc:medical-model-platform/medical-model-platform/medical-model-platform/.cursor/rules/medical-platform.mdc) - 业务平台开发规则
+
+### AI计算引擎
+- [项目入口](mdc:medical-model-platform/medical-model-platform/ai-compute-engine) - AI算法计算引擎
+- [引擎专属规则](mdc:medical-model-platform/medical-model-platform/ai-compute-engine/.cursor/rules/ai-compute-engine.mdc) - 计算引擎开发规则
+
+## 技术栈统一规范
+
+### 共同技术栈
+- **框架版本**: Spring Boot 2.7.4, Java 1.8
+- **数据库**: MySQL 8.0 (共享数据库: medical_model_platform)
+- **ORM**: MyBatis-Plus 3.5.3.1
+- **消息队列**: RabbitMQ (服务间通信)
+- **工具类**: Hutool 5.8.20
+- **JSON**: FastJSON2 2.0.32
+- **API文档**: Swagger 3.0.0
+- **日志**: Logback + 异步输出
+
+### 差异化技术栈
+- **业务平台独有**: SaToken认证、Redis缓存、WebSocket、x-file-storage
+- **计算引擎独有**: Spring WebFlux、算法执行模块
+
+## 端口分配
+- **业务管理平台**: 8080 (上下文路径: /api)
+- **AI计算引擎**: 8082 (根路径: /)
+
+## 服务间通信规范
+
+### 异步通信 (主要)
+- **消息队列**: RabbitMQ
+- **队列命名**: task.submit, task.status.update, task.result
+
+### 同步通信 (辅助)  
+- **协议**: RESTful API
+- **格式**: 统一JSON响应格式
+
+## 开发规范要求
+
+### 代码规范
+- 遵循《阿里巴巴Java开发规范》
+- 遵循《代码整洁之道》原则
+- 方法级别必须添加详细注释
+- 核心业务代码添加行级注释
+
+### 异常处理规范
+- 使用统一的异常处理体系
+- 业务异常继承 BaseException
+- 全局异常处理器统一处理
+- 错误码按模块分类 (1xxx业务、2xxx参数、3xxx数据库等)
+
+### 日志规范
+- 使用SLF4J + Logback
+- 分类记录不同类型日志
+- 异步输出提升性能
+- 生产环境WARN级别，开发环境DEBUG级别
+
+### 配置管理规范
+- 多环境配置 (local/test/prod)
+- 敏感信息不得硬编码
+- 配置项必须有清晰注释
+
+## 项目规则体系
+
+### 规则文件组织
+- **总体规则**: [project-overview.mdc](mdc:medical-model-platform/medical-model-platform/.cursor/rules/project-overview.mdc) - 架构总览和通用规范
+- **通用开发规范**: [development-standards.mdc](mdc:medical-model-platform/medical-model-platform/.cursor/rules/development-standards.mdc) - 统一开发标准
+- **业务平台规则**: [medical-platform.mdc](mdc:medical-model-platform/medical-model-platform/medical-model-platform/.cursor/rules/medical-platform.mdc) - 业务系统专属规则
+- **计算引擎规则**: [ai-compute-engine.mdc](mdc:medical-model-platform/medical-model-platform/ai-compute-engine/.cursor/rules/ai-compute-engine.mdc) - AI引擎专属规则
+
+### 规则使用指南
+- 开发前务必查阅对应项目的专属规则
+- 遵循统一的开发规范和代码标准
+- 重点关注异常处理和日志记录规范
+- 确保服务间通信协议的一致性

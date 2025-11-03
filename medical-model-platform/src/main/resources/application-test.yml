@@ -1,0 +1,130 @@
+# 测试环境配置
+spring:
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://test-mysql:3306/medical_model_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: test123456
+    druid:
+      initial-size: 10
+      min-idle: 10
+      max-active: 50
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+
+  # Redis配置 - Spring Boot 3.x新格式
+  data:
+    redis:
+      host: test-redis
+      port: 6379
+      password:
+      database: 0
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+
+  # RabbitMQ配置
+  rabbitmq:
+    host: test-rabbitmq
+    port: 5672
+    username: admin
+    password: admin123
+    virtual-host: /medical-model-platform-test
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 2
+        max-concurrency: 5
+        prefetch: 1
+        auto-startup: true
+        retry:
+          enabled: true
+          initial-interval: 1000ms
+          max-attempts: 3
+          max-interval: 10000ms
+          multiplier: 1.0
+
+# 邮件配置
+  mail:
+    host: test-smtp
+    port: 587
+    username: no-reply@test.example.com
+    password: change_me
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Sa-Token配置
+sa-token:
+  alone-redis:
+    host: test-redis
+    port: 6379
+    password: 
+    database: 1
+
+# 阿里云OSS配置
+dromara:
+  x-file-storage:
+    default-platform: aliyun-oss-1
+    aliyun-oss:
+      - platform: aliyun-oss-1
+        access-key: your-test-access-key
+        secret-key: your-test-secret-key
+        end-point: https://oss-cn-beijing.aliyuncs.com
+        bucket-name: medical-platform-test
+        domain: https://medical-platform-test.oss-cn-beijing.aliyuncs.com/
+        base-path: test/
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 开启缓存
+    cache-enabled: true
+    # 开启延迟加载
+    lazy-loading-enabled: true
+    # 开启积极延迟加载
+    aggressive-lazy-loading: false
+    # 乐观锁配置
+    optimistic-locker: true
+  global-config:
+    db-config:
+      # 逻辑删除配置
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      # 乐观锁配置
+      version-field: version
+      # 主键策略
+      id-type: ASSIGN_ID
+
+# 日志配置
+logging:
+  level:
+    com.okbug.platform: INFO
+    com.okbug.platform.mapper: OFF
+  file:
+    name: logs/medical-model-platform-test.log
+
